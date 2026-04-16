@@ -236,6 +236,16 @@ const ProjectView: React.FC = () => {
             <button onClick={() => setCreateTicketOpen(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold">
               <Plus size={12} /> New Ticket
             </button>
+            <button onClick={() => { setSelectMode(!selectMode); setSelectedTickets(new Set()); }}
+              className={`flex items-center gap-1 px-3 py-1.5 text-xs border rounded-md transition-colors ${selectMode ? 'bg-nexus-red/10 border-nexus-red text-nexus-red' : 'text-txt-secondary border-brd-subtle hover:border-primary hover:text-primary'}`}>
+              <CheckSquare size={12} /> {selectMode ? 'Cancel Select' : 'Select'}
+            </button>
+            {selectMode && selectedTickets.size > 0 && (
+              <button onClick={handleBulkDelete}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
+                <Trash2 size={12} /> Delete {selectedTickets.size} ticket{selectedTickets.size > 1 ? 's' : ''}
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {/* Filters */}
