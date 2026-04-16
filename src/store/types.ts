@@ -25,8 +25,6 @@ export interface Ticket {
   estimatedHours?: number;
   folderPath?: string;
   dependencies?: string[];
-  subtasksDone?: number;
-  subtasksTotal?: number;
   createdAt: string;
   updatedAt: string;
   completedAt?: string;

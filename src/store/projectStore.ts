@@ -67,7 +67,6 @@ function mapProject(row: any, members: any[], tickets: any[], groups: any[], doc
       priority: t.priority, status: t.status,
       estimatedHours: t.estimated_hours ? Number(t.estimated_hours) : undefined,
       folderPath: t.folder_path, dependencies: t.dependencies || [],
-      subtasksDone: t.subtasks_done, subtasksTotal: t.subtasks_total,
       tags: t.tags || [], notes: t.notes,
       createdAt: t.created_at, updatedAt: t.updated_at, completedAt: t.completed_at,
     })),
@@ -123,8 +122,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
             member_id: t.memberId, project_id: projData.id, group_id: t.groupId || null,
             priority: t.priority, status: t.status,
             estimated_hours: t.estimatedHours, folder_path: t.folderPath,
-            dependencies: t.dependencies || [], subtasks_done: t.subtasksDone || 0,
-            subtasks_total: t.subtasksTotal || 0, tags: t.tags || [], notes: t.notes,
+            dependencies: t.dependencies || [], tags: t.tags || [], notes: t.notes,
             completed_at: t.completedAt,
           }));
           await supabase.from('tickets').insert(ticketInserts);
@@ -262,8 +260,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
       member_id: ticket.memberId, project_id: projectId,
       group_id: ticket.groupId || null, priority: ticket.priority, status: ticket.status,
       estimated_hours: ticket.estimatedHours, folder_path: ticket.folderPath,
-      dependencies: ticket.dependencies || [], subtasks_done: ticket.subtasksDone || 0,
-      subtasks_total: ticket.subtasksTotal || 0, tags: ticket.tags || [],
+      dependencies: ticket.dependencies || [], tags: ticket.tags || [],
       notes: ticket.notes, completed_at: ticket.completedAt,
     }).select().single();
 
@@ -274,7 +271,6 @@ export const useProjectStore = create<AppState>((set, get) => ({
         priority: data.priority, status: data.status,
         estimatedHours: data.estimated_hours ? Number(data.estimated_hours) : undefined,
         folderPath: data.folder_path || undefined, dependencies: data.dependencies || [],
-        subtasksDone: data.subtasks_done || 0, subtasksTotal: data.subtasks_total || 0,
         tags: data.tags || [], notes: data.notes || undefined,
         createdAt: data.created_at, updatedAt: data.updated_at, completedAt: data.completed_at || undefined,
       };
@@ -296,8 +292,6 @@ export const useProjectStore = create<AppState>((set, get) => ({
     if (updates.estimatedHours !== undefined) dbUpdates.estimated_hours = updates.estimatedHours;
     if (updates.folderPath !== undefined) dbUpdates.folder_path = updates.folderPath;
     if (updates.dependencies !== undefined) dbUpdates.dependencies = updates.dependencies;
-    if (updates.subtasksDone !== undefined) dbUpdates.subtasks_done = updates.subtasksDone;
-    if (updates.subtasksTotal !== undefined) dbUpdates.subtasks_total = updates.subtasksTotal;
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
     if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt;
@@ -327,8 +321,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
       member_id: t.memberId, project_id: projectId,
       group_id: t.groupId || null, priority: t.priority, status: t.status,
       estimated_hours: t.estimatedHours, folder_path: t.folderPath,
-      dependencies: t.dependencies || [], subtasks_done: t.subtasksDone || 0,
-      subtasks_total: t.subtasksTotal || 0, tags: t.tags || [], notes: t.notes,
+      dependencies: t.dependencies || [], tags: t.tags || [], notes: t.notes,
     }));
 
     const { data, error } = await supabase.from('tickets').insert(inserts).select();
@@ -339,7 +332,6 @@ export const useProjectStore = create<AppState>((set, get) => ({
         priority: d.priority, status: d.status,
         estimatedHours: d.estimated_hours ? Number(d.estimated_hours) : undefined,
         folderPath: d.folder_path || undefined, dependencies: d.dependencies || [],
-        subtasksDone: d.subtasks_done || 0, subtasksTotal: d.subtasks_total || 0,
         tags: d.tags || [], notes: d.notes || undefined,
         createdAt: d.created_at, updatedAt: d.updated_at,
       }));

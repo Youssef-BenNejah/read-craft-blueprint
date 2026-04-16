@@ -118,8 +118,6 @@ const ProjectView: React.FC = () => {
         estimatedHours: t.estimatedHours,
         folderPath: t.folderPath,
         dependencies: t.dependencies,
-        subtasksDone: t.subtasksDone,
-        subtasksTotal: t.subtasksTotal,
         tags: t.tags,
         notes: t.notes,
       }));

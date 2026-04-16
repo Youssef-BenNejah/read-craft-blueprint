@@ -54,8 +54,6 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [folderPath, setFolderPath] = useState(editTicket?.folderPath || '');
   const [depInput, setDepInput] = useState('');
   const [dependencies, setDependencies] = useState<string[]>(editTicket?.dependencies || []);
-  const [subtasksTotal, setSubtasksTotal] = useState(editTicket?.subtasksTotal?.toString() || '');
-  const [subtasksDone, setSubtasksDone] = useState(editTicket?.subtasksDone?.toString() || '');
   const [notes, setNotes] = useState(editTicket?.notes || '');
 
   if (!project) return null;
@@ -70,8 +68,6 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         estimatedHours: estimatedHours ? Number(estimatedHours) : undefined,
         folderPath: folderPath || undefined,
         dependencies: dependencies.length > 0 ? dependencies : undefined,
-        subtasksTotal: subtasksTotal ? Number(subtasksTotal) : undefined,
-        subtasksDone: subtasksDone ? Number(subtasksDone) : undefined,
         notes: notes || undefined,
         completedAt: status === 'done' ? now : undefined,
       });
@@ -83,8 +79,6 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         estimatedHours: estimatedHours ? Number(estimatedHours) : undefined,
         folderPath: folderPath || undefined,
         dependencies: dependencies.length > 0 ? dependencies : undefined,
-        subtasksTotal: subtasksTotal ? Number(subtasksTotal) : undefined,
-        subtasksDone: subtasksDone ? Number(subtasksDone) : undefined,
         notes: notes || undefined,
       };
       addTicket(projectId, ticket);
@@ -168,16 +162,6 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
           <div>
             <label className="block text-xs text-txt-secondary mb-1">⏱ Est. Hours</label>
             <input type="number" min="0" value={estimatedHours} onChange={e => setEstimatedHours(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label className="block text-xs text-txt-secondary mb-1">Subtasks Done</label>
-            <input type="number" min="0" value={subtasksDone} onChange={e => setSubtasksDone(e.target.value)}
-              className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary" />
-          </div>
-          <div>
-            <label className="block text-xs text-txt-secondary mb-1">Subtasks Total</label>
-            <input type="number" min="0" value={subtasksTotal} onChange={e => setSubtasksTotal(e.target.value)}
               className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary" />
           </div>
         </div>
