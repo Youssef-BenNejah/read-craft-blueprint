@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useProjectStore } from '../../store/projectStore';
 import { getProjectProgress } from '../../utils/progressCalc';
 import {
   LayoutDashboard, FolderOpen, Users,
-  ChevronLeft, ChevronRight, Dot, Target, ClipboardList, FileText
+  ChevronLeft, ChevronRight, Target, ClipboardList, FileText
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const { projects, currentView, setCurrentView, setSelectedProjectId, selectedProjectId } = useProjectStore();
-  const [collapsed, setCollapsed] = useState(false);
+  const { projects, sidebarCollapsed, toggleSidebar } = useProjectStore();
+  const location = useLocation();
+  const { projectId: currentProjectId } = useParams();
+
+  const isProjectView = !!currentProjectId;
+  const currentProject = projects.find(p => p.id === currentProjectId);
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: FolderOpen, label: 'All Projects', path: '/projects' },
-    { icon: Users, label: 'Team Overview', path: '/team', badge: undefined },
+    { icon: Users, label: 'Team Overview', path: '/team' },
   ];
 
   return (
@@ -75,16 +79,13 @@ const Sidebar = () => {
           {/* Members list */}
           <div className="mt-3 space-y-1">
             <span className="text-[10px] uppercase tracking-wider text-txt-muted">Team</span>
-            {currentProject.members.map(m => {
-              const prog = getProjectProgress(currentProject);
-              return (
-                <div key={m.id} className="flex items-center gap-2 px-2 py-1 text-xs text-txt-secondary">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: m.color }} />
-                  <span className="truncate">{m.name}</span>
-                  <span className="ml-auto font-code text-[10px] text-txt-muted">{m.role}</span>
-                </div>
-              );
-            })}
+            {currentProject.members.map(m => (
+              <div key={m.id} className="flex items-center gap-2 px-2 py-1 text-xs text-txt-secondary">
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: m.color }} />
+                <span className="truncate">{m.name}</span>
+                <span className="ml-auto font-code text-[10px] text-txt-muted">{m.role}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -94,10 +95,8 @@ const Sidebar = () => {
         <nav className="flex-1 py-2 space-y-0.5 px-2">
           {navItems.map((item) => {
             const isActive = item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path);
-            const isDisabled = !!item.badge;
             return (
-              <Link key={item.label} to={isDisabled ? '#' : item.path}
-                onClick={isDisabled ? (e: React.MouseEvent) => e.preventDefault() : undefined}
+              <Link key={item.label} to={item.path}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                   isActive
                     ? 'text-primary bg-primary/10 border-l-2 border-primary'
@@ -105,14 +104,7 @@ const Sidebar = () => {
                 }`}
               >
                 <item.icon size={18} />
-                {!sidebarCollapsed && (
-                  <>
-                    <span>{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-brd-subtle text-txt-muted">{item.badge}</span>
-                    )}
-                  </>
-                )}
+                {!sidebarCollapsed && <span>{item.label}</span>}
               </Link>
             );
           })}
