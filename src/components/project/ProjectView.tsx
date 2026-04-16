@@ -441,7 +441,7 @@ const ProjectView: React.FC = () => {
         )}
 
         {/* List View */}
-        {viewMode === 'list' && (
+        {activeView === 'list' && (
           <div className="bg-surface-card border border-brd-subtle rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>
