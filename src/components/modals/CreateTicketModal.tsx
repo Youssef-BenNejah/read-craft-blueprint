@@ -77,8 +77,8 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
       });
       toast.success('Ticket updated');
     } else {
-      const ticket: Ticket = {
-        id: crypto.randomUUID(), code, name, description, memberId, projectId,
+      const ticket = {
+        code, name, description, memberId, projectId,
         groupId: groupId || undefined, priority, status,
         estimatedHours: estimatedHours ? Number(estimatedHours) : undefined,
         folderPath: folderPath || undefined,
@@ -86,7 +86,6 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         subtasksTotal: subtasksTotal ? Number(subtasksTotal) : undefined,
         subtasksDone: subtasksDone ? Number(subtasksDone) : undefined,
         notes: notes || undefined,
-        createdAt: now, updatedAt: now,
       };
       addTicket(projectId, ticket);
       toast.success('Ticket created');
