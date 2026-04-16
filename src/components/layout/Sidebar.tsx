@@ -6,9 +6,6 @@ import {
   LayoutDashboard, FolderOpen, Users,
   ChevronLeft, ChevronRight, Dot, Target, ClipboardList, FileText
 } from 'lucide-react';
-import { useProjectStore } from '../../store/projectStore';
-import { getProjectProgress } from '../../utils/progressCalc';
-import { NexusBadge } from '../nexus-ui/NexusBadge';
 
 const Sidebar = () => {
   const { projects, currentView, setCurrentView, setSelectedProjectId, selectedProjectId } = useProjectStore();
