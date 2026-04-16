@@ -139,9 +139,14 @@ const TeamOverviewView: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-right space-y-1">
-                    <div className="flex items-center gap-4 text-xs text-txt-muted">
+                    <div className="flex items-center gap-3 text-xs text-txt-muted">
                       <span>{member.doneTickets}/{member.totalTickets} tickets</span>
                       <span>{member.totalHours}h</span>
+                      <button onClick={() => setDeleteTarget(member)}
+                        className="p-1 rounded hover:bg-nexus-red/10 text-txt-muted hover:text-nexus-red transition-colors"
+                        title="Remove member">
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                     <div className="w-40">
                       <NexusProgressBar percentage={percentage} color={member.color} height={4} showLabel />
