@@ -18,7 +18,7 @@ const statusFilters: { label: string; value: ProjectStatus | 'all' }[] = [
 ];
 
 const DashboardView: React.FC = () => {
-  const { projects, deleteProject } = useProjectStore();
+  const { projects, deleteProject, loading } = useProjectStore();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<ProjectStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<'latest' | 'name' | 'progress'>('latest');
