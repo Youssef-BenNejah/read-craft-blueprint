@@ -8,7 +8,7 @@ import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import TicketCard from './TicketCard';
 import CreateTicketModal from '../modals/CreateTicketModal';
 import NexusModal from '../nexus-ui/NexusModal';
-import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown, Download, Trash2, File, FolderOpen } from 'lucide-react';
+import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown, Download, Trash2, File, FolderOpen, CheckSquare, Square } from 'lucide-react';
 import { Ticket, TicketGroup, TicketPriority, TicketStatus, TeamMember } from '../../store/types';
 import { toast } from 'sonner';
 
@@ -16,7 +16,7 @@ const ProjectView: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
+  const { projects, updateTicket, addGroup, addMember, deleteGroup, deleteGroupWithTickets, deleteTickets, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
   const isDocsView = location.pathname.includes('/docs');
 
@@ -35,6 +35,32 @@ const ProjectView: React.FC = () => {
   const [importJson, setImportJson] = useState('');
   const [newGroupLabel, setNewGroupLabel] = useState('');
   const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedTickets, setSelectedTickets] = useState<Set<string>>(new Set());
+
+  const toggleTicketSelection = (ticketId: string) => {
+    setSelectedTickets(prev => {
+      const next = new Set(prev);
+      if (next.has(ticketId)) next.delete(ticketId); else next.add(ticketId);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedTickets.size === 0) return;
+    if (!confirm(`Delete ${selectedTickets.size} selected ticket(s)?`)) return;
+    deleteTickets(project!.id, Array.from(selectedTickets));
+    setSelectedTickets(new Set());
+    setSelectMode(false);
+    toast.success(`${selectedTickets.size} tickets deleted`);
+  };
+
+  const handleDeleteGroupWithTickets = (groupId: string, groupLabel: string) => {
+    const ticketCount = project!.tickets.filter(t => t.groupId === groupId).length;
+    if (!confirm(`Delete group "${groupLabel}" and its ${ticketCount} ticket(s)?`)) return;
+    deleteGroupWithTickets(project!.id, groupId);
+    toast.success(`Group and ${ticketCount} tickets deleted`);
+  };
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<TicketStatus | 'all'>('all');
@@ -210,6 +236,16 @@ const ProjectView: React.FC = () => {
             <button onClick={() => setCreateTicketOpen(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold">
               <Plus size={12} /> New Ticket
             </button>
+            <button onClick={() => { setSelectMode(!selectMode); setSelectedTickets(new Set()); }}
+              className={`flex items-center gap-1 px-3 py-1.5 text-xs border rounded-md transition-colors ${selectMode ? 'bg-nexus-red/10 border-nexus-red text-nexus-red' : 'text-txt-secondary border-brd-subtle hover:border-primary hover:text-primary'}`}>
+              <CheckSquare size={12} /> {selectMode ? 'Cancel Select' : 'Select'}
+            </button>
+            {selectMode && selectedTickets.size > 0 && (
+              <button onClick={handleBulkDelete}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
+                <Trash2 size={12} /> Delete {selectedTickets.size} ticket{selectedTickets.size > 1 ? 's' : ''}
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {/* Filters */}
@@ -303,9 +339,15 @@ const ProjectView: React.FC = () => {
                       <Upload size={12} />
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
-                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto">
+                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto" title="Remove group (keep tickets)">
                       <X size={12} />
                     </button>
+                    {groupTickets.length > 0 && (
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteGroupWithTickets(group.id, group.label); }}
+                        className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red" title="Delete group + all tickets">
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
 
                   {!collapsed && (
@@ -330,6 +372,9 @@ const ProjectView: React.FC = () => {
                                   memberColor={member.color}
                                   memberName={member.name}
                                   onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                                  selectMode={selectMode}
+                                  selected={selectedTickets.has(ticket.id)}
+                                  onToggleSelect={toggleTicketSelection}
                                 />
                               ))
                             )}
@@ -359,6 +404,9 @@ const ProjectView: React.FC = () => {
                             key={ticket.id} ticket={ticket} projectId={project.id}
                             memberColor={member.color} memberName={member.name}
                             onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                            selectMode={selectMode}
+                            selected={selectedTickets.has(ticket.id)}
+                            onToggleSelect={toggleTicketSelection}
                           />
                         ))}
                       </div>

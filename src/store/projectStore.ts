@@ -27,6 +27,8 @@ interface AppState {
   addTicket: (projectId: string, ticket: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateTicket: (projectId: string, ticketId: string, updates: Partial<Ticket>) => Promise<void>;
   deleteTicket: (projectId: string, ticketId: string) => Promise<void>;
+  deleteTickets: (projectId: string, ticketIds: string[]) => Promise<void>;
+  deleteGroupWithTickets: (projectId: string, groupId: string) => Promise<void>;
   importTickets: (projectId: string, tickets: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<void>;
 
   // Group CRUD
@@ -313,6 +315,28 @@ export const useProjectStore = create<AppState>((set, get) => ({
       } : p)
     }));
     await supabase.from('tickets').delete().eq('id', ticketId);
+  },
+
+  deleteTickets: async (projectId, ticketIds) => {
+    if (ticketIds.length === 0) return;
+    set(s => ({
+      projects: s.projects.map(p => p.id === projectId ? {
+        ...p, tickets: p.tickets.filter(t => !ticketIds.includes(t.id))
+      } : p)
+    }));
+    await supabase.from('tickets').delete().in('id', ticketIds);
+  },
+
+  deleteGroupWithTickets: async (projectId, groupId) => {
+    set(s => ({
+      projects: s.projects.map(p => p.id === projectId ? {
+        ...p,
+        groups: p.groups.filter(g => g.id !== groupId),
+        tickets: p.tickets.filter(t => t.groupId !== groupId),
+      } : p)
+    }));
+    await supabase.from('tickets').delete().eq('group_id', groupId);
+    await supabase.from('ticket_groups').delete().eq('id', groupId);
   },
 
   importTickets: async (projectId, tickets) => {
