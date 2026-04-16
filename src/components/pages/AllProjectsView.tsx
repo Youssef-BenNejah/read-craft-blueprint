@@ -35,7 +35,7 @@ const AllProjectsView: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <TopBar />
+      <TopBar title="All Projects" />
       <div className="p-6 animate-fade-up">
         <div className="flex items-center justify-between mb-6">
           <div>

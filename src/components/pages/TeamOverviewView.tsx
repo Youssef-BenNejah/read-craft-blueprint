@@ -57,7 +57,7 @@ const TeamOverviewView: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <TopBar />
+      <TopBar title="Team Overview" />
       <div className="p-6 animate-fade-up">
         <div className="mb-6">
           <h1 className="font-mono text-xl font-bold text-txt-primary">Team Overview</h1>
