@@ -54,8 +54,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [folderPath, setFolderPath] = useState(editTicket?.folderPath || '');
   const [depInput, setDepInput] = useState('');
   const [dependencies, setDependencies] = useState<string[]>(editTicket?.dependencies || []);
-  const [subtasksTotal, setSubtasksTotal] = useState(editTicket?.subtasksTotal?.toString() || '');
-  const [subtasksDone, setSubtasksDone] = useState(editTicket?.subtasksDone?.toString() || '');
+  const [notes, setNotes] = useState(editTicket?.notes || '');
   const [notes, setNotes] = useState(editTicket?.notes || '');
 
   if (!project) return null;

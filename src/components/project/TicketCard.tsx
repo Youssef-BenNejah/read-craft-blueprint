@@ -79,8 +79,6 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
           )}
         </div>
 
-        {/* Progress bar */}
-        {subtaskProgress !== null && (
       </div>
     </div>
   );
