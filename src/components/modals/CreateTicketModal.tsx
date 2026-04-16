@@ -27,11 +27,11 @@ interface Props {
 const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultMemberId, defaultGroupId, editTicket }) => {
   const { projects, addTicket, updateTicket, deleteTicket } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
-  if (!project) return null;
 
   const isEdit = !!editTicket;
 
   const getNextCode = (memberId: string) => {
+    if (!project) return 'X-01';
     const member = project.members.find(m => m.id === memberId);
     if (!member) return 'X-01';
     const prefix = member.name[0].toUpperCase();
@@ -46,7 +46,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [code, setCode] = useState(editTicket?.code || (defaultMemberId ? getNextCode(defaultMemberId) : ''));
   const [name, setName] = useState(editTicket?.name || '');
   const [description, setDescription] = useState(editTicket?.description || '');
-  const [memberId, setMemberId] = useState(editTicket?.memberId || defaultMemberId || project.members[0]?.id || '');
+  const [memberId, setMemberId] = useState(editTicket?.memberId || defaultMemberId || project?.members[0]?.id || '');
   const [groupId, setGroupId] = useState(editTicket?.groupId || defaultGroupId || '');
   const [priority, setPriority] = useState<TicketPriority>(editTicket?.priority || 'medium');
   const [status, setStatus] = useState<TicketStatus>(editTicket?.status || 'todo');
@@ -57,6 +57,8 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [subtasksTotal, setSubtasksTotal] = useState(editTicket?.subtasksTotal?.toString() || '');
   const [subtasksDone, setSubtasksDone] = useState(editTicket?.subtasksDone?.toString() || '');
   const [notes, setNotes] = useState(editTicket?.notes || '');
+
+  if (!project) return null;
 
   const handleSubmit = () => {
     if (!name.trim() || !code.trim()) return;
