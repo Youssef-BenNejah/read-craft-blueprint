@@ -70,6 +70,15 @@ const TeamOverviewView: React.FC = () => {
     setAddOpen(false);
   };
 
+  const handleDeleteMember = () => {
+    if (!deleteTarget) return;
+    deleteTarget.projects.forEach(p => {
+      removeMember(p.id, p.memberId);
+    });
+    toast.success(`${deleteTarget.name} removed from ${deleteTarget.projects.length} project(s)`);
+    setDeleteTarget(null);
+  };
+
   return (
     <div className="min-h-screen">
       <TopBar title="Team Overview" />
