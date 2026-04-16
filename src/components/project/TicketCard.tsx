@@ -54,6 +54,11 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
       <div className="p-3">
         {/* Header row */}
         <div className="flex items-center gap-2 mb-2 flex-wrap">
+          {selectMode && (
+            <span className="flex-shrink-0 text-txt-muted">
+              {selected ? <CheckSquare size={16} className="text-nexus-red" /> : <Square size={16} />}
+            </span>
+          )}
           {/* Completion circle */}
           <button onClick={toggleDone}
             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
