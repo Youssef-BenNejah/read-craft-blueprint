@@ -112,6 +112,7 @@ const ProjectView: React.FC = () => {
         description: t.description || '',
         memberId: importMemberId || project.members[0]?.id || '',
         projectId: project.id,
+        groupId: importGroupId,
         priority: t.priority || 'medium',
         status: t.status || 'todo',
         estimatedHours: t.estimatedHours,
