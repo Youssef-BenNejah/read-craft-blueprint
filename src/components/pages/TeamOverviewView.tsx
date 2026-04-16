@@ -190,6 +190,23 @@ const TeamOverviewView: React.FC = () => {
           </div>
         </div>
       </NexusModal>
+
+      {/* Delete Confirmation Modal */}
+      <NexusModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Remove Team Member">
+        {deleteTarget && (
+          <div className="space-y-4">
+            <p className="text-sm text-txt-secondary">
+              Remove <strong className="text-txt-primary">{deleteTarget.name}</strong> from {deleteTarget.projects.length} project{deleteTarget.projects.length !== 1 ? 's' : ''}?
+            </p>
+            <p className="text-xs text-txt-muted">Their assigned tickets will remain but become unassigned.</p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setDeleteTarget(null)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
+              <button onClick={handleDeleteMember}
+                className="px-4 py-2 bg-nexus-red text-white rounded-md text-xs font-semibold">Remove</button>
+            </div>
+          </div>
+        )}
+      </NexusModal>
     </div>
   );
 };
