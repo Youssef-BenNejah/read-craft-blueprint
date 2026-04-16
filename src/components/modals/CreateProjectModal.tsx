@@ -59,20 +59,17 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
 
   const handleNext = () => { if (validate()) setStep(step + 1); };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!validate()) return;
-    const now = new Date().toISOString();
-    const project: Project = {
-      id: crypto.randomUUID(), name, description, color, emoji, status: 'not_started',
-      startDate, endDate, tags,
-      members: members.map(m => ({ ...m, id: crypto.randomUUID(), joinedAt: now })),
-      tickets: [], groups: [], documents: [], createdAt: now, updatedAt: now,
+    const projectData = {
+      id: '', name, description, color, emoji, status: 'not_started' as const,
+      startDate, endDate, tags, createdAt: '', updatedAt: '',
     };
-    addProject(project);
+    const newId = await addProject(projectData, members, []);
     toast.success(`Project '${name}' created successfully! 🚀`);
     reset();
     onClose();
-    navigate(`/project/${project.id}`);
+    if (newId) navigate(`/project/${newId}`);
   };
 
   const duration = startDate && endDate ? Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
