@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import TopBar from '../layout/TopBar';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import NexusModal from '../nexus-ui/NexusModal';
-import { Users, FolderOpen, CheckCircle2, Clock, Plus } from 'lucide-react';
+import { Users, FolderOpen, CheckCircle2, Clock, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AggregatedMember {
   name: string;
   color: string;
   roles: string[];
-  projects: { id: string; name: string; color: string }[];
+  projects: { id: string; name: string; color: string; memberId: string }[];
   totalTickets: number;
   doneTickets: number;
   totalHours: number;
@@ -20,9 +20,10 @@ interface AggregatedMember {
 const MEMBER_COLORS = ['#60a5fa', '#f472b6', '#a78bfa', '#34d399', '#fbbf24', '#f87171', '#38bdf8', '#c084fc'];
 
 const TeamOverviewView: React.FC = () => {
-  const { projects, addMember, loading } = useProjectStore();
+  const { projects, addMember, removeMember, loading } = useProjectStore();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AggregatedMember | null>(null);
   const [form, setForm] = useState({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[0] });
   // Aggregate members across all projects by name
   const memberMap = new Map<string, AggregatedMember>();
@@ -35,7 +36,7 @@ const TeamOverviewView: React.FC = () => {
 
       if (existing) {
         if (!existing.roles.includes(member.role)) existing.roles.push(member.role);
-        existing.projects.push({ id: project.id, name: project.name, color: project.color });
+        existing.projects.push({ id: project.id, name: project.name, color: project.color, memberId: member.id });
         existing.totalTickets += memberTickets.length;
         existing.doneTickets += done;
         existing.totalHours += hours;
@@ -44,7 +45,7 @@ const TeamOverviewView: React.FC = () => {
           name: member.name,
           color: member.color,
           roles: [member.role],
-          projects: [{ id: project.id, name: project.name, color: project.color }],
+          projects: [{ id: project.id, name: project.name, color: project.color, memberId: member.id }],
           totalTickets: memberTickets.length,
           doneTickets: done,
           totalHours: hours,
@@ -67,6 +68,15 @@ const TeamOverviewView: React.FC = () => {
     toast.success(`${form.name} added to all ${projects.length} projects`);
     setForm({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[Math.floor(Math.random() * MEMBER_COLORS.length)] });
     setAddOpen(false);
+  };
+
+  const handleDeleteMember = () => {
+    if (!deleteTarget) return;
+    deleteTarget.projects.forEach(p => {
+      removeMember(p.id, p.memberId);
+    });
+    toast.success(`${deleteTarget.name} removed from ${deleteTarget.projects.length} project(s)`);
+    setDeleteTarget(null);
   };
 
   return (
@@ -129,9 +139,14 @@ const TeamOverviewView: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-right space-y-1">
-                    <div className="flex items-center gap-4 text-xs text-txt-muted">
+                    <div className="flex items-center gap-3 text-xs text-txt-muted">
                       <span>{member.doneTickets}/{member.totalTickets} tickets</span>
                       <span>{member.totalHours}h</span>
+                      <button onClick={() => setDeleteTarget(member)}
+                        className="p-1 rounded hover:bg-nexus-red/10 text-txt-muted hover:text-nexus-red transition-colors"
+                        title="Remove member">
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                     <div className="w-40">
                       <NexusProgressBar percentage={percentage} color={member.color} height={4} showLabel />
@@ -174,6 +189,23 @@ const TeamOverviewView: React.FC = () => {
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold disabled:opacity-50">Add to All Projects</button>
           </div>
         </div>
+      </NexusModal>
+
+      {/* Delete Confirmation Modal */}
+      <NexusModal open={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Remove Team Member">
+        {deleteTarget && (
+          <div className="space-y-4">
+            <p className="text-sm text-txt-secondary">
+              Remove <strong className="text-txt-primary">{deleteTarget.name}</strong> from {deleteTarget.projects.length} project{deleteTarget.projects.length !== 1 ? 's' : ''}?
+            </p>
+            <p className="text-xs text-txt-muted">Their assigned tickets will remain but become unassigned.</p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setDeleteTarget(null)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
+              <button onClick={handleDeleteMember}
+                className="px-4 py-2 bg-nexus-red text-white rounded-md text-xs font-semibold">Remove</button>
+            </div>
+          </div>
+        )}
       </NexusModal>
     </div>
   );
