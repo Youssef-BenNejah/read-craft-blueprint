@@ -3,7 +3,7 @@ import NexusModal from '../nexus-ui/NexusModal';
 import { useProjectStore } from '../../store/projectStore';
 import { Project, TeamMember } from '../../store/types';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, Rocket, Monitor, Smartphone, Palette, BarChart3, FlaskConical, Building2, Target, Brain, Lock, Radio, Zap, Globe, Package, Gamepad2 } from 'lucide-react';
+import { Plus, X, Rocket, Monitor, Smartphone, Palette, BarChart3, FlaskConical, Building2, Target, Brain, Lock, Radio, Zap, Globe, Package, Gamepad2, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PRESET_COLORS = ['#4ade80','#60a5fa','#f87171','#fb923c','#c084fc','#22d3ee','#facc15','#f472b6','#a78bfa','#34d399','#fb7185','#94a3b8'];
