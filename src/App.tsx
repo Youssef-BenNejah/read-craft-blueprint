@@ -32,6 +32,7 @@ const App = () => (
           <Routes>
             <Route element={<AppLayout />}>
               <Route path="/" element={<DashboardView />} />
+              <Route path="/dashboard" element={<DashboardView />} />
               <Route path="/projects" element={<AllProjectsView />} />
               <Route path="/team" element={<TeamOverviewView />} />
               <Route path="/project/:projectId" element={<ProjectView />} />
