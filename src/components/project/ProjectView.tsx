@@ -19,13 +19,14 @@ const ProjectView: React.FC = () => {
   const { projects, updateTicket, addGroup, addMember, deleteGroup, deleteGroupWithTickets, deleteTickets, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
   const isDocsView = location.pathname.includes('/docs');
+  const isListView = location.pathname.includes('/list');
+  const activeView: 'board' | 'list' | 'docs' = isDocsView ? 'docs' : isListView ? 'list' : 'board';
 
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | undefined>();
   const [defaultMemberId, setDefaultMemberId] = useState<string>();
   const [defaultGroupId, setDefaultGroupId] = useState<string>();
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
   const [editProjectOpen, setEditProjectOpen] = useState(false);
@@ -278,10 +279,10 @@ const ProjectView: React.FC = () => {
               </button>
             )}
             <div className="flex border border-brd-subtle rounded-md overflow-hidden ml-2">
-              <button onClick={() => setViewMode('board')} className={`p-1.5 ${viewMode === 'board' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
+              <button onClick={() => navigate(`/project/${projectId}`)} className={`p-1.5 ${activeView === 'board' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
                 <LayoutGrid size={14} />
               </button>
-              <button onClick={() => setViewMode('list')} className={`p-1.5 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
+              <button onClick={() => navigate(`/project/${projectId}/list`)} className={`p-1.5 ${activeView === 'list' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
                 <List size={14} />
               </button>
             </div>
@@ -289,7 +290,7 @@ const ProjectView: React.FC = () => {
         </div>
 
         {/* Board View */}
-        {viewMode === 'board' && (
+        {activeView === 'board' && (
           <div>
             {/* Member column headers */}
             <div className="flex gap-4 mb-4 overflow-x-auto scrollbar-thin pb-2">
@@ -440,7 +441,7 @@ const ProjectView: React.FC = () => {
         )}
 
         {/* List View */}
-        {viewMode === 'list' && (
+        {activeView === 'list' && (
           <div className="bg-surface-card border border-brd-subtle rounded-xl overflow-hidden">
             <table className="w-full text-xs">
               <thead>
@@ -474,6 +475,67 @@ const ProjectView: React.FC = () => {
             </table>
             {sortedTickets.length === 0 && (
               <div className="text-center py-8 text-txt-muted text-sm">No tickets match your filters</div>
+            )}
+          </div>
+        )}
+
+        {/* Documents View */}
+        {activeView === 'docs' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-mono text-sm font-bold text-txt-primary">Documents</h3>
+              <label className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold cursor-pointer">
+                <Upload size={12} /> Upload Document
+                <input type="file" className="hidden" onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const ext = file.name.split('.').pop()?.toLowerCase() || 'other';
+                    const docType = ['pdf', 'doc', 'docx', 'txt', 'md'].includes(ext) ? ext as any : 'other';
+                    addDocument(project.id, {
+                      name: file.name,
+                      type: docType,
+                      size: file.size,
+                      dataUrl: reader.result as string,
+                    });
+                    toast.success(`"${file.name}" uploaded`);
+                  };
+                  reader.readAsDataURL(file);
+                }} />
+              </label>
+            </div>
+            {project.documents.length === 0 ? (
+              <div className="bg-surface-card border border-dashed border-brd-medium rounded-xl p-12 text-center">
+                <FileText size={32} className="mx-auto mb-3 text-txt-muted" />
+                <p className="text-sm text-txt-muted">No documents yet</p>
+                <p className="text-xs text-txt-muted mt-1">Upload files to attach them to this project</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {project.documents.map(doc => (
+                  <div key={doc.id} className="bg-surface-card border border-brd-subtle rounded-lg p-4 flex items-start gap-3 group">
+                    <File size={20} className="text-txt-muted flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-txt-primary truncate">{doc.name}</p>
+                      <p className="text-[10px] text-txt-muted mt-1">
+                        {doc.type.toUpperCase()} · {(doc.size / 1024).toFixed(1)} KB · {new Date(doc.uploadedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {doc.dataUrl && (
+                        <a href={doc.dataUrl} download={doc.name} className="p-1 text-txt-muted hover:text-primary">
+                          <Download size={14} />
+                        </a>
+                      )}
+                      <button onClick={() => { removeDocument(project.id, doc.id); toast.success('Document removed'); }}
+                        className="p-1 text-txt-muted hover:text-nexus-red">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}
