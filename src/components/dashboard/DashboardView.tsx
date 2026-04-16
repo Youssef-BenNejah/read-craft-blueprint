@@ -196,9 +196,9 @@ const DashboardView: React.FC = () => {
                       <div className="flex items-center gap-1">
                         <div className="flex -space-x-1">
                           {project.members.slice(0, 4).map(m => (
-                            <span key={m.id} className="w-5 h-5 rounded-full border-2 border-surface-card flex items-center justify-center text-[9px]"
+                            <span key={m.id} className="w-5 h-5 rounded-full border-2 border-surface-card flex items-center justify-center text-[9px] font-bold text-white"
                               style={{ backgroundColor: m.color }}>
-                              {m.avatarEmoji || m.name[0]}
+                              {m.name[0]}
                             </span>
                           ))}
                         </div>
