@@ -190,8 +190,8 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
 
         <div>
           <label className="block text-xs text-txt-secondary mb-1">📝 Notes</label>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Private notes..."
-            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-none" />
+          <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={Math.max(4, Math.min(12, (notes || '').split('\n').length + 1))} placeholder="Private notes..."
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
         </div>
       </div>
 
