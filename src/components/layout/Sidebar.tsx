@@ -4,7 +4,7 @@ import { useProjectStore } from '../../store/projectStore';
 import { getProjectProgress } from '../../utils/progressCalc';
 import {
   LayoutDashboard, FolderOpen, Users, BarChart3, Settings,
-  ChevronLeft, ChevronRight, Dot
+  ChevronLeft, ChevronRight, Dot, Target, ClipboardList, FileText
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -54,7 +54,7 @@ const Sidebar: React.FC = () => {
       {isProjectView && currentProject && !sidebarCollapsed && (
         <div className="px-4 py-3 border-b border-brd-subtle">
           <div className="flex items-center gap-2">
-            <span className="text-lg">{currentProject.emoji || '📁'}</span>
+            <FolderOpen size={18} style={{ color: currentProject.color }} />
             <span className="font-mono text-xs font-semibold text-txt-primary truncate">{currentProject.name}</span>
           </div>
           <div className="mt-3 space-y-1">
@@ -63,19 +63,19 @@ const Sidebar: React.FC = () => {
                 !location.pathname.includes('/list') && !location.pathname.includes('/docs')
                   ? 'text-primary bg-primary/10' : 'text-txt-secondary hover:text-txt-primary'
               }`}>
-              🎯 Board
+              <Target size={14} /> Board
             </Link>
             <Link to={`/project/${currentProjectId}/list`}
               className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors ${
                 location.pathname.includes('/list') ? 'text-primary bg-primary/10' : 'text-txt-secondary hover:text-txt-primary'
               }`}>
-              📋 List
+              <ClipboardList size={14} /> List
             </Link>
             <Link to={`/project/${currentProjectId}/docs`}
               className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors ${
                 location.pathname.includes('/docs') ? 'text-primary bg-primary/10' : 'text-txt-secondary hover:text-txt-primary'
               }`}>
-              📄 Documents
+              <FileText size={14} /> Documents
             </Link>
           </div>
           {/* Members list */}

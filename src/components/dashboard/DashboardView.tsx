@@ -6,7 +6,7 @@ import { getProjectProgress } from '../../utils/progressCalc';
 import { ProjectStatusBadge } from '../nexus-ui/NexusBadge';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import CreateProjectModal from '../modals/CreateProjectModal';
-import { FolderOpen, Plus, Calendar, Users, ArrowRight, MoreVertical, Trash2, Copy, Archive, Edit, Rocket, LayoutGrid, List } from 'lucide-react';
+import { FolderOpen, Plus, Calendar, Users, ArrowRight, MoreVertical, Trash2, Copy, Archive, Edit, Rocket, LayoutGrid, List, RefreshCw, CheckCircle2, UsersRound } from 'lucide-react';
 import { Project, ProjectStatus } from '../../store/types';
 
 const statusFilters: { label: string; value: ProjectStatus | 'all' }[] = [
@@ -47,10 +47,10 @@ const DashboardView: React.FC = () => {
   const completed = projects.filter(p => p.status === 'completed').length;
 
   const stats = [
-    { label: 'Total Projects', value: projects.length, icon: '📁', color: 'text-nexus-blue' },
-    { label: 'In Progress', value: inProgress, icon: '🔄', color: 'text-nexus-orange' },
-    { label: 'Completed', value: completed, icon: '✅', color: 'text-nexus-green' },
-    { label: 'Team Members', value: totalMembers, icon: '👥', color: 'text-nexus-purple' },
+    { label: 'Total Projects', value: projects.length, icon: FolderOpen, color: 'text-nexus-blue' },
+    { label: 'In Progress', value: inProgress, icon: RefreshCw, color: 'text-nexus-orange' },
+    { label: 'Completed', value: completed, icon: CheckCircle2, color: 'text-nexus-green' },
+    { label: 'Team Members', value: totalMembers, icon: UsersRound, color: 'text-nexus-purple' },
   ];
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -80,7 +80,7 @@ const DashboardView: React.FC = () => {
         <div className="grid grid-cols-4 gap-4 mb-6">
           {stats.map(s => (
             <div key={s.label} className="bg-surface-card border border-brd-subtle rounded-lg p-4 flex items-center gap-4 hover:border-brd-medium transition-colors">
-              <span className="text-2xl">{s.icon}</span>
+              <s.icon size={24} className={s.color} />
               <div>
                 <p className={`font-mono text-2xl font-bold ${s.color}`}>{s.value}</p>
                 <p className="text-xs text-txt-secondary">{s.label}</p>
@@ -147,7 +147,7 @@ const DashboardView: React.FC = () => {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{project.emoji || '📁'}</span>
+                        <FolderOpen size={20} style={{ color: project.color }} />
                         <h3 className="font-mono text-sm font-bold text-txt-primary">{project.name}</h3>
                       </div>
                       <div className="flex items-center gap-2">
@@ -196,9 +196,9 @@ const DashboardView: React.FC = () => {
                       <div className="flex items-center gap-1">
                         <div className="flex -space-x-1">
                           {project.members.slice(0, 4).map(m => (
-                            <span key={m.id} className="w-5 h-5 rounded-full border-2 border-surface-card flex items-center justify-center text-[9px]"
+                            <span key={m.id} className="w-5 h-5 rounded-full border-2 border-surface-card flex items-center justify-center text-[9px] font-bold text-white"
                               style={{ backgroundColor: m.color }}>
-                              {m.avatarEmoji || m.name[0]}
+                              {m.name[0]}
                             </span>
                           ))}
                         </div>

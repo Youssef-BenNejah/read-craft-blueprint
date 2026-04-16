@@ -3,11 +3,17 @@ import NexusModal from '../nexus-ui/NexusModal';
 import { useProjectStore } from '../../store/projectStore';
 import { Project, TeamMember } from '../../store/types';
 import { useNavigate } from 'react-router-dom';
-import { Plus, X, Rocket } from 'lucide-react';
+import { Plus, X, Rocket, Monitor, Smartphone, Palette, BarChart3, FlaskConical, Building2, Target, Brain, Lock, Radio, Zap, Globe, Package, Gamepad2, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PRESET_COLORS = ['#4ade80','#60a5fa','#f87171','#fb923c','#c084fc','#22d3ee','#facc15','#f472b6','#a78bfa','#34d399','#fb7185','#94a3b8'];
-const EMOJIS = ['🚀','🛠️','📱','💻','🎨','📊','🔬','🏗️','🎯','🧠','🔐','📡','⚡','🌐','📦','🎮'];
+const PROJECT_ICONS = [
+  { icon: Rocket, label: 'Rocket' }, { icon: Monitor, label: 'Monitor' }, { icon: Smartphone, label: 'Smartphone' },
+  { icon: Palette, label: 'Palette' }, { icon: BarChart3, label: 'BarChart3' }, { icon: FlaskConical, label: 'FlaskConical' },
+  { icon: Building2, label: 'Building2' }, { icon: Target, label: 'Target' }, { icon: Brain, label: 'Brain' },
+  { icon: Lock, label: 'Lock' }, { icon: Radio, label: 'Radio' }, { icon: Zap, label: 'Zap' },
+  { icon: Globe, label: 'Globe' }, { icon: Package, label: 'Package' }, { icon: Gamepad2, label: 'Gamepad2' },
+];
 
 interface Props { open: boolean; onClose: () => void; }
 
@@ -17,7 +23,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [emoji, setEmoji] = useState('🚀');
+  const [emoji, setEmoji] = useState('Rocket');
   const [color, setColor] = useState(PRESET_COLORS[0]);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -29,7 +35,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const reset = () => {
-    setStep(1); setName(''); setDescription(''); setEmoji('🚀'); setColor(PRESET_COLORS[0]);
+    setStep(1); setName(''); setDescription(''); setEmoji('Rocket'); setColor(PRESET_COLORS[0]);
     setTags([]); setTagInput(''); setStartDate(''); setEndDate(''); setMembers([]); setErrors({});
     setShowMemberForm(false);
   };
@@ -66,7 +72,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
       startDate, endDate, tags, createdAt: '', updatedAt: '',
     };
     const newId = await addProject(projectData, members, []);
-    toast.success(`Project '${name}' created successfully! 🚀`);
+    toast.success(`Project '${name}' created successfully!`);
     reset();
     onClose();
     if (newId) navigate(`/project/${newId}`);
@@ -75,7 +81,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
   const duration = startDate && endDate ? Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
   return (
-    <NexusModal open={open} onClose={() => { reset(); onClose(); }} title="✨ New Project" wide>
+    <NexusModal open={open} onClose={() => { reset(); onClose(); }} title="New Project" wide>
       {/* Step indicators */}
       <div className="flex items-center gap-2 mb-6">
         {['Basics', 'Timeline', 'Team', 'Documents'].map((s, i) => (
@@ -102,14 +108,17 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
             <p className="text-[10px] text-txt-muted text-right">{description.length}/300</p>
           </div>
           <div>
-            <label className="block text-xs text-txt-secondary mb-1">Emoji</label>
+            <label className="block text-xs text-txt-secondary mb-1">Icon</label>
             <div className="flex flex-wrap gap-2">
-              {EMOJIS.map(e => (
-                <button key={e} onClick={() => setEmoji(e)}
-                  className={`w-8 h-8 rounded-md flex items-center justify-center text-lg ${emoji === e ? 'bg-primary/20 ring-1 ring-primary' : 'bg-surface-card hover:bg-surface-card-hover'} transition-colors`}>
-                  {e}
-                </button>
-              ))}
+              {PROJECT_ICONS.map(item => {
+                const IconComp = item.icon;
+                return (
+                  <button key={item.label} onClick={() => setEmoji(item.label)}
+                    className={`w-8 h-8 rounded-md flex items-center justify-center ${emoji === item.label ? 'bg-primary/20 ring-1 ring-primary' : 'bg-surface-card hover:bg-surface-card-hover'} transition-colors`}>
+                    <IconComp size={16} className="text-txt-primary" />
+                  </button>
+                );
+              })}
             </div>
           </div>
           <div>
@@ -155,7 +164,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
               className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary" />
             {errors.endDate && <p className="text-xs text-nexus-red mt-1">{errors.endDate}</p>}
           </div>
-          {duration > 0 && <p className="text-sm text-txt-secondary">📅 Duration: <strong className="text-txt-primary">{duration} days</strong></p>}
+          {duration > 0 && <p className="text-sm text-txt-secondary flex items-center gap-1"><Calendar size={14} /> Duration: <strong className="text-txt-primary">{duration} days</strong></p>}
         </div>
       )}
 
