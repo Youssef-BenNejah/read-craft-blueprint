@@ -16,7 +16,7 @@ interface Props {
   onToggleSelect?: (id: string) => void;
 }
 
-const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit }) => {
+const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit, selectMode, selected, onToggleSelect }) => {
   const { updateTicket } = useProjectStore();
   const [bursting, setBursting] = useState(false);
   const isDone = ticket.status === 'done';
@@ -33,12 +33,19 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
     });
   };
 
-  const subtaskProgress = null;
+  const handleClick = () => {
+    if (selectMode && onToggleSelect) {
+      onToggleSelect(ticket.id);
+    } else {
+      onEdit();
+    }
+  };
 
   return (
     <div
-      onClick={onEdit}
+      onClick={handleClick}
       className={`group relative rounded-lg border cursor-pointer transition-all duration-200 hover:scale-[1.01] ${
+        selected ? 'ring-2 ring-nexus-red border-nexus-red bg-nexus-red/5' :
         isDone ? 'bg-[hsl(142,69%,58%,0.04)] border-brd-subtle' :
         isBlocked ? 'bg-[hsl(0,91%,71%,0.04)] border-l-2 border-l-nexus-red border-brd-subtle' :
         'bg-surface-card border-brd-subtle hover:border-brd-medium hover:bg-surface-card-hover'
