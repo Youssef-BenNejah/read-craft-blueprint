@@ -168,21 +168,10 @@ const TeamOverviewView: React.FC = () => {
               ))}
             </div>
           </div>
-          <div>
-            <label className="block text-xs text-txt-secondary mb-1">Add to project *</label>
-            <select value={form.projectId} onChange={e => setForm({ ...form, projectId: e.target.value })}
-              className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary">
-              <option value="">Select a project...</option>
-              <option value="all">All projects</option>
-              {projects.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
           <div className="flex gap-2 mt-4 justify-end">
             <button onClick={() => setAddOpen(false)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
-            <button onClick={handleAddMember} disabled={!form.name.trim() || !form.role.trim() || !form.projectId}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold disabled:opacity-50">Add Member</button>
+            <button onClick={handleAddMember} disabled={!form.name.trim() || !form.role.trim() || projects.length === 0}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold disabled:opacity-50">Add to All Projects</button>
           </div>
         </div>
       </NexusModal>
