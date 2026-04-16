@@ -36,7 +36,7 @@ const TeamOverviewView: React.FC = () => {
 
       if (existing) {
         if (!existing.roles.includes(member.role)) existing.roles.push(member.role);
-        existing.projects.push({ id: project.id, name: project.name, color: project.color });
+        existing.projects.push({ id: project.id, name: project.name, color: project.color, memberId: member.id });
         existing.totalTickets += memberTickets.length;
         existing.doneTickets += done;
         existing.totalHours += hours;
