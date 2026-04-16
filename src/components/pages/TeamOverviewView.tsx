@@ -11,7 +11,7 @@ interface AggregatedMember {
   name: string;
   color: string;
   roles: string[];
-  projects: { id: string; name: string; color: string }[];
+  projects: { id: string; name: string; color: string; memberId: string }[];
   totalTickets: number;
   doneTickets: number;
   totalHours: number;
