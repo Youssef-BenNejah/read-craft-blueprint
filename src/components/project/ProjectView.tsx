@@ -31,6 +31,7 @@ const ProjectView: React.FC = () => {
   const [editProjectOpen, setEditProjectOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importMemberId, setImportMemberId] = useState('');
+  const [importGroupId, setImportGroupId] = useState<string | undefined>();
   const [importJson, setImportJson] = useState('');
   const [newGroupLabel, setNewGroupLabel] = useState('');
   const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
