@@ -14,7 +14,256 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      project_documents: {
+        Row: {
+          data_url: string | null
+          doc_type: string
+          id: string
+          name: string
+          project_id: string
+          size: number
+          uploaded_at: string
+          url: string | null
+        }
+        Insert: {
+          data_url?: string | null
+          doc_type?: string
+          id?: string
+          name: string
+          project_id: string
+          size?: number
+          uploaded_at?: string
+          url?: string | null
+        }
+        Update: {
+          data_url?: string | null
+          doc_type?: string
+          id?: string
+          name?: string
+          project_id?: string
+          size?: number
+          uploaded_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_documents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          emoji: string | null
+          end_date: string
+          id: string
+          name: string
+          start_date: string
+          status: Database["public"]["Enums"]["project_status"]
+          tags: string[] | null
+          total_tasks_override: number | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string
+          emoji?: string | null
+          end_date: string
+          id?: string
+          name: string
+          start_date: string
+          status?: Database["public"]["Enums"]["project_status"]
+          tags?: string[] | null
+          total_tasks_override?: number | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          emoji?: string | null
+          end_date?: string
+          id?: string
+          name?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["project_status"]
+          tags?: string[] | null
+          total_tasks_override?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          avatar_emoji: string | null
+          color: string
+          id: string
+          joined_at: string
+          name: string
+          project_id: string
+          responsibilities: string
+          role: string
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          color?: string
+          id?: string
+          joined_at?: string
+          name: string
+          project_id: string
+          responsibilities?: string
+          role: string
+        }
+        Update: {
+          avatar_emoji?: string | null
+          color?: string
+          id?: string
+          joined_at?: string
+          name?: string
+          project_id?: string
+          responsibilities?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_groups: {
+        Row: {
+          color: string | null
+          description: string | null
+          id: string
+          label: string
+          project_id: string
+          sort_order: number
+        }
+        Insert: {
+          color?: string | null
+          description?: string | null
+          id?: string
+          label: string
+          project_id: string
+          sort_order?: number
+        }
+        Update: {
+          color?: string | null
+          description?: string | null
+          id?: string
+          label?: string
+          project_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_groups_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          code: string
+          completed_at: string | null
+          created_at: string
+          dependencies: string[] | null
+          description: string
+          estimated_hours: number | null
+          folder_path: string | null
+          group_id: string | null
+          id: string
+          member_id: string
+          name: string
+          notes: string | null
+          priority: Database["public"]["Enums"]["ticket_priority"]
+          project_id: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          subtasks_done: number | null
+          subtasks_total: number | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          completed_at?: string | null
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string
+          estimated_hours?: number | null
+          folder_path?: string | null
+          group_id?: string | null
+          id?: string
+          member_id: string
+          name: string
+          notes?: string | null
+          priority?: Database["public"]["Enums"]["ticket_priority"]
+          project_id: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          subtasks_done?: number | null
+          subtasks_total?: number | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          completed_at?: string | null
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string
+          estimated_hours?: number | null
+          folder_path?: string | null
+          group_id?: string | null
+          id?: string
+          member_id?: string
+          name?: string
+          notes?: string | null
+          priority?: Database["public"]["Enums"]["ticket_priority"]
+          project_id?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          subtasks_done?: number | null
+          subtasks_total?: number | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +272,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      project_status:
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "on_hold"
+        | "cancelled"
+      ticket_priority: "blocker" | "critical" | "high" | "medium" | "low"
+      ticket_status: "todo" | "in_progress" | "done" | "blocked"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +406,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      project_status: [
+        "not_started",
+        "in_progress",
+        "completed",
+        "on_hold",
+        "cancelled",
+      ],
+      ticket_priority: ["blocker", "critical", "high", "medium", "low"],
+      ticket_status: ["todo", "in_progress", "done", "blocked"],
+    },
   },
 } as const
