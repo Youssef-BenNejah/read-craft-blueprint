@@ -372,6 +372,9 @@ const ProjectView: React.FC = () => {
                                   memberColor={member.color}
                                   memberName={member.name}
                                   onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                                  selectMode={selectMode}
+                                  selected={selectedTickets.has(ticket.id)}
+                                  onToggleSelect={toggleTicketSelection}
                                 />
                               ))
                             )}
@@ -401,6 +404,9 @@ const ProjectView: React.FC = () => {
                             key={ticket.id} ticket={ticket} projectId={project.id}
                             memberColor={member.color} memberName={member.name}
                             onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                            selectMode={selectMode}
+                            selected={selectedTickets.has(ticket.id)}
+                            onToggleSelect={toggleTicketSelection}
                           />
                         ))}
                       </div>
