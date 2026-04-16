@@ -23,8 +23,7 @@ const TeamOverviewView: React.FC = () => {
   const { projects, addMember, loading } = useProjectStore();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[0], projectId: '' });
-
+  const [form, setForm] = useState({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[0] });
   // Aggregate members across all projects by name
   const memberMap = new Map<string, AggregatedMember>();
   projects.forEach(project => {
