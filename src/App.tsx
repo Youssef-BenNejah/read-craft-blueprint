@@ -6,23 +6,37 @@ import AppLayout from "./components/layout/AppLayout";
 import DashboardView from "./components/dashboard/DashboardView";
 import ProjectView from "./components/project/ProjectView";
 import NotFound from "./pages/NotFound";
+import { useProjectStore } from "./store/projectStore";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
+
+const AppInitializer = ({ children }: { children: React.ReactNode }) => {
+  const { loadProjects, initialized } = useProjectStore();
+
+  useEffect(() => {
+    if (!initialized) loadProjects();
+  }, [initialized, loadProjects]);
+
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<DashboardView />} />
-            <Route path="/project/:projectId" element={<ProjectView />} />
-            <Route path="/project/:projectId/list" element={<ProjectView />} />
-            <Route path="/project/:projectId/docs" element={<ProjectView />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+        <AppInitializer>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<DashboardView />} />
+              <Route path="/project/:projectId" element={<ProjectView />} />
+              <Route path="/project/:projectId/list" element={<ProjectView />} />
+              <Route path="/project/:projectId/docs" element={<ProjectView />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </AppInitializer>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -103,9 +103,7 @@ const ProjectView: React.FC = () => {
       const tickets = JSON.parse(importJson);
       if (!Array.isArray(tickets)) throw new Error('Not array');
       const { importTickets } = useProjectStore.getState();
-      const now = new Date().toISOString();
       const mapped = tickets.map((t: any) => ({
-        id: crypto.randomUUID(),
         code: t.code || 'X-00',
         name: t.name || 'Untitled',
         description: t.description || '',
@@ -120,8 +118,6 @@ const ProjectView: React.FC = () => {
         subtasksTotal: t.subtasksTotal,
         tags: t.tags,
         notes: t.notes,
-        createdAt: now,
-        updatedAt: now,
       }));
       importTickets(project.id, mapped);
       toast.success(`${mapped.length} tickets imported`);
