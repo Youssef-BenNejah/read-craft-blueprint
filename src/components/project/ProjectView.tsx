@@ -299,6 +299,10 @@ const ProjectView: React.FC = () => {
                     <Calendar size={14} className="text-txt-muted" />
                     <h3 className="font-mono text-sm font-bold text-txt-primary">{group.label}</h3>
                     <span className="text-[10px] text-txt-muted">{gp.total} tickets · {gp.totalHours}h · {gp.done}/{gp.total} ({gp.percentage}%)</span>
+                    <button onClick={(e) => { e.stopPropagation(); setImportGroupId(group.id); setImportMemberId(project.members[0]?.id || ''); setImportOpen(true); }}
+                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-primary ml-1" title="Import tickets into this group">
+                      <Upload size={12} />
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
                       className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto">
                       <X size={12} />
