@@ -8,7 +8,7 @@ import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import TicketCard from './TicketCard';
 import CreateTicketModal from '../modals/CreateTicketModal';
 import NexusModal from '../nexus-ui/NexusModal';
-import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown, Download, Trash2, File, FolderOpen } from 'lucide-react';
+import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown, Download, Trash2, File, FolderOpen, CheckSquare, Square } from 'lucide-react';
 import { Ticket, TicketGroup, TicketPriority, TicketStatus, TeamMember } from '../../store/types';
 import { toast } from 'sonner';
 
