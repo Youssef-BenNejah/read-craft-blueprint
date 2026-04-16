@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useProjectStore } from '../../store/projectStore';
 import { getProjectProgress, getMemberProgress, getGroupProgress } from '../../utils/progressCalc';
 import TopBar from '../layout/TopBar';
@@ -8,15 +8,17 @@ import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import TicketCard from './TicketCard';
 import CreateTicketModal from '../modals/CreateTicketModal';
 import NexusModal from '../nexus-ui/NexusModal';
-import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown } from 'lucide-react';
+import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown, Download, Trash2, File } from 'lucide-react';
 import { Ticket, TicketGroup, TicketPriority, TicketStatus, TeamMember } from '../../store/types';
 import { toast } from 'sonner';
 
 const ProjectView: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject } = useProjectStore();
+  const location = useLocation();
+  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
+  const isDocsView = location.pathname.includes('/docs');
 
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | undefined>();
@@ -82,7 +84,7 @@ const ProjectView: React.FC = () => {
   const handleAddGroup = () => {
     if (!newGroupLabel.trim()) return;
     addGroup(project.id, {
-      id: crypto.randomUUID(), projectId: project.id, label: newGroupLabel,
+      projectId: project.id, label: newGroupLabel,
       order: project.groups.length + 1,
     });
     setNewGroupLabel('');
@@ -92,9 +94,7 @@ const ProjectView: React.FC = () => {
 
   const handleAddMember = () => {
     if (!memberFormData.name || !memberFormData.role) return;
-    addMember(project.id, {
-      id: crypto.randomUUID(), ...memberFormData, joinedAt: new Date().toISOString(),
-    });
+    addMember(project.id, memberFormData);
     setMemberFormData({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
     setAddMemberOpen(false);
     toast.success('Member added');
@@ -105,9 +105,7 @@ const ProjectView: React.FC = () => {
       const tickets = JSON.parse(importJson);
       if (!Array.isArray(tickets)) throw new Error('Not array');
       const { importTickets } = useProjectStore.getState();
-      const now = new Date().toISOString();
       const mapped = tickets.map((t: any) => ({
-        id: crypto.randomUUID(),
         code: t.code || 'X-00',
         name: t.name || 'Untitled',
         description: t.description || '',
@@ -122,8 +120,6 @@ const ProjectView: React.FC = () => {
         subtasksTotal: t.subtasksTotal,
         tags: t.tags,
         notes: t.notes,
-        createdAt: now,
-        updatedAt: now,
       }));
       importTickets(project.id, mapped);
       toast.success(`${mapped.length} tickets imported`);

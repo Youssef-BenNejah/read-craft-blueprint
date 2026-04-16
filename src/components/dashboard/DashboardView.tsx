@@ -18,7 +18,7 @@ const statusFilters: { label: string; value: ProjectStatus | 'all' }[] = [
 ];
 
 const DashboardView: React.FC = () => {
-  const { projects, deleteProject } = useProjectStore();
+  const { projects, deleteProject, loading } = useProjectStore();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<ProjectStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<'latest' | 'name' | 'progress'>('latest');
@@ -54,6 +54,22 @@ const DashboardView: React.FC = () => {
   ];
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <TopBar title="Dashboard" />
+        <div className="p-6">
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            {[1,2,3,4].map(i => <div key={i} className="h-24 rounded-lg animate-shimmer" />)}
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {[1,2,3].map(i => <div key={i} className="h-64 rounded-xl animate-shimmer" />)}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
