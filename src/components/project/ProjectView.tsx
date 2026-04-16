@@ -473,9 +473,9 @@ const ProjectView: React.FC = () => {
       </NexusModal>
 
       {/* Import JSON Modal */}
-      <NexusModal open={importOpen} onClose={() => setImportOpen(false)} title="📥 Import Tickets from JSON" wide>
+      <NexusModal open={importOpen} onClose={() => { setImportOpen(false); setImportGroupId(undefined); }} title={`Import Tickets${importGroupId ? ` → ${project.groups.find(g => g.id === importGroupId)?.label || 'Group'}` : ''}`} wide>
         <div className="space-y-4">
-          <p className="text-xs text-txt-secondary">Paste JSON array of tickets. Each ticket needs at least <code className="font-code text-primary">name</code> and <code className="font-code text-primary">code</code>.</p>
+          <p className="text-xs text-txt-secondary">Paste JSON array of tickets. Each ticket needs at least <code className="font-code text-primary">name</code> and <code className="font-code text-primary">code</code>.{importGroupId && <span className="text-primary ml-1">Tickets will be added to the selected group.</span>}</p>
           <details className="text-xs text-txt-muted">
             <summary className="cursor-pointer hover:text-txt-secondary">JSON Schema Reference</summary>
             <pre className="mt-2 p-3 bg-surface-secondary rounded-md overflow-x-auto font-code text-[10px]">{`[{
