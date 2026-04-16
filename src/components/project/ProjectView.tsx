@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useProjectStore } from '../../store/projectStore';
 import { getProjectProgress, getMemberProgress, getGroupProgress } from '../../utils/progressCalc';
 import TopBar from '../layout/TopBar';
@@ -8,7 +8,7 @@ import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import TicketCard from './TicketCard';
 import CreateTicketModal from '../modals/CreateTicketModal';
 import NexusModal from '../nexus-ui/NexusModal';
-import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown } from 'lucide-react';
+import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown, Download, Trash2, File } from 'lucide-react';
 import { Ticket, TicketGroup, TicketPriority, TicketStatus, TeamMember } from '../../store/types';
 import { toast } from 'sonner';
 
