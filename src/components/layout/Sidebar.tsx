@@ -17,8 +17,8 @@ const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: FolderOpen, label: 'All Projects', path: '/' },
-    { icon: Users, label: 'Team Overview', path: '/', badge: undefined },
+    { icon: FolderOpen, label: 'All Projects', path: '/projects' },
+    { icon: Users, label: 'Team Overview', path: '/team', badge: undefined },
     { icon: BarChart3, label: 'Analytics', path: '/', badge: 'Soon' },
     { icon: Settings, label: 'Settings', path: '/', badge: 'Soon' },
   ];
