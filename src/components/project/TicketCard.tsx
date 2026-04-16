@@ -30,8 +30,7 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
     });
   };
 
-  const subtaskProgress = ticket.subtasksTotal && ticket.subtasksTotal > 0
-    ? Math.round(((ticket.subtasksDone || 0) / ticket.subtasksTotal) * 100) : null;
+  const subtaskProgress = null;
 
   return (
     <div
@@ -82,13 +81,6 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
 
         {/* Progress bar */}
         {subtaskProgress !== null && (
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <NexusProgressBar percentage={subtaskProgress} color={memberColor} height={3} />
-            </div>
-            <span className="font-code text-[10px] text-txt-muted">{ticket.subtasksDone}/{ticket.subtasksTotal}</span>
-          </div>
-        )}
       </div>
     </div>
   );

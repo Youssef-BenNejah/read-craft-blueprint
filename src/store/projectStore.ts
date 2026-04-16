@@ -292,8 +292,6 @@ export const useProjectStore = create<AppState>((set, get) => ({
     if (updates.estimatedHours !== undefined) dbUpdates.estimated_hours = updates.estimatedHours;
     if (updates.folderPath !== undefined) dbUpdates.folder_path = updates.folderPath;
     if (updates.dependencies !== undefined) dbUpdates.dependencies = updates.dependencies;
-    if (updates.subtasksDone !== undefined) dbUpdates.subtasks_done = updates.subtasksDone;
-    if (updates.subtasksTotal !== undefined) dbUpdates.subtasks_total = updates.subtasksTotal;
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
     if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt;
