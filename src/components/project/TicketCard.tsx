@@ -3,7 +3,7 @@ import { Ticket } from '../../store/types';
 import { useProjectStore } from '../../store/projectStore';
 import { PriorityBadge, StatusBadge } from '../nexus-ui/NexusBadge';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
-import { Clock, Folder, ArrowUpRight, Check } from 'lucide-react';
+import { Clock, Folder, ArrowUpRight, Check, Square, CheckSquare } from 'lucide-react';
 
 interface Props {
   ticket: Ticket;
@@ -11,6 +11,9 @@ interface Props {
   memberColor: string;
   memberName: string;
   onEdit: () => void;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit }) => {
