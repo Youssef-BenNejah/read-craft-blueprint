@@ -127,6 +127,7 @@ const ProjectView: React.FC = () => {
       toast.success(`${mapped.length} tickets imported`);
       setImportOpen(false);
       setImportJson('');
+      setImportGroupId(undefined);
     } catch {
       toast.error('Invalid JSON format');
     }
