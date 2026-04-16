@@ -35,6 +35,32 @@ const ProjectView: React.FC = () => {
   const [importJson, setImportJson] = useState('');
   const [newGroupLabel, setNewGroupLabel] = useState('');
   const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedTickets, setSelectedTickets] = useState<Set<string>>(new Set());
+
+  const toggleTicketSelection = (ticketId: string) => {
+    setSelectedTickets(prev => {
+      const next = new Set(prev);
+      if (next.has(ticketId)) next.delete(ticketId); else next.add(ticketId);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedTickets.size === 0) return;
+    if (!confirm(`Delete ${selectedTickets.size} selected ticket(s)?`)) return;
+    deleteTickets(project!.id, Array.from(selectedTickets));
+    setSelectedTickets(new Set());
+    setSelectMode(false);
+    toast.success(`${selectedTickets.size} tickets deleted`);
+  };
+
+  const handleDeleteGroupWithTickets = (groupId: string, groupLabel: string) => {
+    const ticketCount = project!.tickets.filter(t => t.groupId === groupId).length;
+    if (!confirm(`Delete group "${groupLabel}" and its ${ticketCount} ticket(s)?`)) return;
+    deleteGroupWithTickets(project!.id, groupId);
+    toast.success(`Group and ${ticketCount} tickets deleted`);
+  };
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<TicketStatus | 'all'>('all');
