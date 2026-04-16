@@ -279,10 +279,10 @@ const ProjectView: React.FC = () => {
               </button>
             )}
             <div className="flex border border-brd-subtle rounded-md overflow-hidden ml-2">
-              <button onClick={() => setViewMode('board')} className={`p-1.5 ${viewMode === 'board' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
+              <button onClick={() => navigate(`/project/${projectId}`)} className={`p-1.5 ${activeView === 'board' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
                 <LayoutGrid size={14} />
               </button>
-              <button onClick={() => setViewMode('list')} className={`p-1.5 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
+              <button onClick={() => navigate(`/project/${projectId}/list`)} className={`p-1.5 ${activeView === 'list' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
                 <List size={14} />
               </button>
             </div>
@@ -290,7 +290,7 @@ const ProjectView: React.FC = () => {
         </div>
 
         {/* Board View */}
-        {viewMode === 'board' && (
+        {activeView === 'board' && (
           <div>
             {/* Member column headers */}
             <div className="flex gap-4 mb-4 overflow-x-auto scrollbar-thin pb-2">
