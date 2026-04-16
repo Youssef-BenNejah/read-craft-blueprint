@@ -172,7 +172,7 @@ const ProjectView: React.FC = () => {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">{project.emoji || '📁'}</span>
+                <FolderOpen size={24} style={{ color: project.color }} />
                 <h1 className="font-mono text-xl font-bold text-txt-primary">{project.name}</h1>
                 <ProjectStatusBadge status={project.status} />
               </div>
@@ -455,7 +455,7 @@ const ProjectView: React.FC = () => {
       </NexusModal>
 
       {/* Add Group Modal */}
-      <NexusModal open={addGroupOpen} onClose={() => setAddGroupOpen(false)} title="📁 Add Group">
+      <NexusModal open={addGroupOpen} onClose={() => setAddGroupOpen(false)} title="Add Group">
         <div className="space-y-3">
           <input value={newGroupLabel} onChange={e => setNewGroupLabel(e.target.value)} placeholder="e.g. DAY 3 — DEPLOYMENT"
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm font-mono text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted" />
