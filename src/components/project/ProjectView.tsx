@@ -1,0 +1,575 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useProjectStore } from '../../store/projectStore';
+import { getProjectProgress, getMemberProgress, getGroupProgress } from '../../utils/progressCalc';
+import TopBar from '../layout/TopBar';
+import { ProjectStatusBadge, PriorityBadge, StatusBadge } from '../nexus-ui/NexusBadge';
+import NexusProgressBar from '../nexus-ui/NexusProgressBar';
+import TicketCard from './TicketCard';
+import CreateTicketModal from '../modals/CreateTicketModal';
+import NexusModal from '../nexus-ui/NexusModal';
+import { Calendar, Users, Ticket as TicketIcon, Plus, Upload, ChevronDown, ChevronRight, Settings, FileText, LayoutGrid, List, Filter, Search, X, MoreVertical, ArrowUpDown } from 'lucide-react';
+import { Ticket, TicketGroup, TicketPriority, TicketStatus, TeamMember } from '../../store/types';
+import { toast } from 'sonner';
+
+const ProjectView: React.FC = () => {
+  const { projectId } = useParams();
+  const navigate = useNavigate();
+  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject } = useProjectStore();
+  const project = projects.find(p => p.id === projectId);
+
+  const [createTicketOpen, setCreateTicketOpen] = useState(false);
+  const [editingTicket, setEditingTicket] = useState<Ticket | undefined>();
+  const [defaultMemberId, setDefaultMemberId] = useState<string>();
+  const [defaultGroupId, setDefaultGroupId] = useState<string>();
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
+  const [addGroupOpen, setAddGroupOpen] = useState(false);
+  const [editProjectOpen, setEditProjectOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importMemberId, setImportMemberId] = useState('');
+  const [importJson, setImportJson] = useState('');
+  const [newGroupLabel, setNewGroupLabel] = useState('');
+  const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
+
+  // Filters
+  const [filterStatus, setFilterStatus] = useState<TicketStatus | 'all'>('all');
+  const [filterPriority, setFilterPriority] = useState<TicketPriority | 'all'>('all');
+  const [filterMember, setFilterMember] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Sort for list view
+  const [sortColumn, setSortColumn] = useState<string>('code');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'n' && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault();
+        setCreateTicketOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  if (!project) return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h2 className="font-mono text-lg text-txt-primary mb-4">Project not found</h2>
+      <button onClick={() => navigate('/')} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm">Back to Dashboard</button>
+    </div>
+  );
+
+  const { done, total, percentage } = getProjectProgress(project);
+  const days = Math.ceil((new Date(project.endDate).getTime() - new Date(project.startDate).getTime()) / (1000 * 60 * 60 * 24));
+  const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  const filterTickets = (tickets: Ticket[]) => tickets.filter(t => {
+    if (filterStatus !== 'all' && t.status !== filterStatus) return false;
+    if (filterPriority !== 'all' && t.priority !== filterPriority) return false;
+    if (filterMember !== 'all' && t.memberId !== filterMember) return false;
+    if (searchQuery && !t.name.toLowerCase().includes(searchQuery.toLowerCase()) && !t.code.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
+
+  const toggleGroup = (id: string) => {
+    const next = new Set(collapsedGroups);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setCollapsedGroups(next);
+  };
+
+  const handleAddGroup = () => {
+    if (!newGroupLabel.trim()) return;
+    addGroup(project.id, {
+      id: crypto.randomUUID(), projectId: project.id, label: newGroupLabel,
+      order: project.groups.length + 1,
+    });
+    setNewGroupLabel('');
+    setAddGroupOpen(false);
+    toast.success('Group added');
+  };
+
+  const handleAddMember = () => {
+    if (!memberFormData.name || !memberFormData.role) return;
+    addMember(project.id, {
+      id: crypto.randomUUID(), ...memberFormData, joinedAt: new Date().toISOString(),
+    });
+    setMemberFormData({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
+    setAddMemberOpen(false);
+    toast.success('Member added');
+  };
+
+  const handleImportJson = () => {
+    try {
+      const tickets = JSON.parse(importJson);
+      if (!Array.isArray(tickets)) throw new Error('Not array');
+      const { importTickets } = useProjectStore.getState();
+      const now = new Date().toISOString();
+      const mapped = tickets.map((t: any) => ({
+        id: crypto.randomUUID(),
+        code: t.code || 'X-00',
+        name: t.name || 'Untitled',
+        description: t.description || '',
+        memberId: importMemberId || project.members[0]?.id || '',
+        projectId: project.id,
+        priority: t.priority || 'medium',
+        status: t.status || 'todo',
+        estimatedHours: t.estimatedHours,
+        folderPath: t.folderPath,
+        dependencies: t.dependencies,
+        subtasksDone: t.subtasksDone,
+        subtasksTotal: t.subtasksTotal,
+        tags: t.tags,
+        notes: t.notes,
+        createdAt: now,
+        updatedAt: now,
+      }));
+      importTickets(project.id, mapped);
+      toast.success(`${mapped.length} tickets imported`);
+      setImportOpen(false);
+      setImportJson('');
+    } catch {
+      toast.error('Invalid JSON format');
+    }
+  };
+
+  const exportProject = () => {
+    const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${project.name.replace(/\s+/g, '_')}_export_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Project exported');
+  };
+
+  // Groups + ungrouped
+  const sortedGroups = [...project.groups].sort((a, b) => a.order - b.order);
+  const ungroupedTickets = filterTickets(project.tickets.filter(t => !t.groupId));
+  const hasFilters = filterStatus !== 'all' || filterPriority !== 'all' || filterMember !== 'all' || searchQuery;
+
+  // List view sort
+  const allFilteredTickets = filterTickets(project.tickets);
+  const sortedTickets = [...allFilteredTickets].sort((a, b) => {
+    let cmp = 0;
+    if (sortColumn === 'code') cmp = a.code.localeCompare(b.code);
+    if (sortColumn === 'name') cmp = a.name.localeCompare(b.name);
+    if (sortColumn === 'priority') cmp = a.priority.localeCompare(b.priority);
+    if (sortColumn === 'status') cmp = a.status.localeCompare(b.status);
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  const toggleSort = (col: string) => {
+    if (sortColumn === col) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortColumn(col); setSortDir('asc'); }
+  };
+
+  return (
+    <div className="min-h-screen">
+      <TopBar title={project.name} />
+
+      <div className="p-6 animate-fade-up">
+        {/* Project Header */}
+        <div className="bg-surface-card border border-brd-subtle rounded-xl p-6 mb-6">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">{project.emoji || '📁'}</span>
+                <h1 className="font-mono text-xl font-bold text-txt-primary">{project.name}</h1>
+                <ProjectStatusBadge status={project.status} />
+              </div>
+              <p className="text-sm text-txt-secondary mb-3">{project.description}</p>
+              <div className="flex items-center gap-4 text-xs text-txt-muted">
+                <span className="flex items-center gap-1"><Calendar size={12} />{formatDate(project.startDate)} – {formatDate(project.endDate)}</span>
+                <span className="flex items-center gap-1"><Users size={12} />{project.members.length} Devs × {days} Days</span>
+                <span className="flex items-center gap-1"><TicketIcon size={12} />{total} Tickets</span>
+              </div>
+            </div>
+
+            <div className="text-right min-w-[200px]">
+              <p className="text-[10px] uppercase tracking-wider text-txt-muted mb-1">Sprint Progress</p>
+              <p className="font-mono text-3xl font-bold text-primary mb-2">{percentage}%</p>
+              <NexusProgressBar percentage={percentage} color={project.color} height={6} />
+              <p className="text-xs text-txt-muted mt-1">{done}/{total} tasks</p>
+              <div className="flex items-center gap-2 mt-3 justify-end">
+                <button onClick={exportProject} className="p-1.5 rounded border border-brd-subtle text-txt-muted hover:text-txt-primary text-xs"><FileText size={14} /></button>
+                <button onClick={() => setEditProjectOpen(true)} className="p-1.5 rounded border border-brd-subtle text-txt-muted hover:text-txt-primary"><Settings size={14} /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action bar */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <button onClick={() => setAddMemberOpen(true)} className="flex items-center gap-1 px-3 py-1.5 text-xs text-txt-secondary border border-brd-subtle rounded-md hover:border-primary hover:text-primary transition-colors">
+              <Plus size={12} /> Add Member
+            </button>
+            <button onClick={() => setAddGroupOpen(true)} className="flex items-center gap-1 px-3 py-1.5 text-xs text-txt-secondary border border-brd-subtle rounded-md hover:border-primary hover:text-primary transition-colors">
+              <Plus size={12} /> Add Group
+            </button>
+            <button onClick={() => setCreateTicketOpen(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold">
+              <Plus size={12} /> New Ticket
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Filters */}
+            <div className="flex items-center gap-1 px-2 py-1 bg-surface-card border border-brd-subtle rounded-md">
+              <Search size={12} className="text-txt-muted" />
+              <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Filter tickets..."
+                className="bg-transparent text-xs text-txt-primary outline-none w-28 placeholder:text-txt-muted" />
+            </div>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)}
+              className="bg-surface-card border border-brd-subtle text-txt-secondary text-xs rounded-md px-2 py-1.5 outline-none">
+              <option value="all">All Status</option>
+              <option value="todo">Todo</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+              <option value="blocked">Blocked</option>
+            </select>
+            <select value={filterPriority} onChange={e => setFilterPriority(e.target.value as any)}
+              className="bg-surface-card border border-brd-subtle text-txt-secondary text-xs rounded-md px-2 py-1.5 outline-none">
+              <option value="all">All Priority</option>
+              <option value="blocker">Blocker</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+            {hasFilters && (
+              <button onClick={() => { setFilterStatus('all'); setFilterPriority('all'); setFilterMember('all'); setSearchQuery(''); }}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs text-nexus-red hover:bg-nexus-red/10 rounded-md">
+                <X size={12} /> Clear
+              </button>
+            )}
+            <div className="flex border border-brd-subtle rounded-md overflow-hidden ml-2">
+              <button onClick={() => setViewMode('board')} className={`p-1.5 ${viewMode === 'board' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
+                <LayoutGrid size={14} />
+              </button>
+              <button onClick={() => setViewMode('list')} className={`p-1.5 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
+                <List size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Board View */}
+        {viewMode === 'board' && (
+          <div>
+            {/* Member column headers */}
+            <div className="flex gap-4 mb-4 overflow-x-auto scrollbar-thin pb-2">
+              {project.members.map(member => {
+                const mp = getMemberProgress(project, member.id);
+                return (
+                  <div key={member.id} className="min-w-[280px] flex-1">
+                    <div className="bg-surface-card border border-brd-subtle rounded-lg p-3 mb-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: member.color }} />
+                        <span className="font-semibold text-sm text-txt-primary">{member.name}</span>
+                        <span className="font-code text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-txt-muted">{member.role}</span>
+                      </div>
+                      <NexusProgressBar percentage={mp.percentage} color={member.color} height={3} showLabel />
+                      <p className="text-[10px] text-txt-muted mt-1">{mp.done}/{mp.total} tasks</p>
+                      <div className="flex gap-1 mt-2">
+                        <button onClick={() => { setDefaultMemberId(member.id); setCreateTicketOpen(true); }}
+                          className="flex items-center gap-1 px-2 py-1 text-[10px] text-primary border border-primary/30 rounded hover:bg-primary/10 transition-colors">
+                          <Plus size={10} /> Ticket
+                        </button>
+                        <button onClick={() => { setImportMemberId(member.id); setImportOpen(true); }}
+                          className="flex items-center gap-1 px-2 py-1 text-[10px] text-txt-muted border border-brd-subtle rounded hover:border-brd-medium transition-colors">
+                          <Upload size={10} /> Import
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Groups */}
+            {sortedGroups.map(group => {
+              const gp = getGroupProgress(project, group.id);
+              const collapsed = collapsedGroups.has(group.id);
+              const groupTickets = filterTickets(project.tickets.filter(t => t.groupId === group.id));
+
+              return (
+                <div key={group.id} className="mb-4">
+                  <div className="flex items-center gap-3 mb-3 group cursor-pointer" onClick={() => toggleGroup(group.id)}>
+                    {collapsed ? <ChevronRight size={16} className="text-txt-muted" /> : <ChevronDown size={16} className="text-txt-muted" />}
+                    <Calendar size={14} className="text-txt-muted" />
+                    <h3 className="font-mono text-sm font-bold text-txt-primary">{group.label}</h3>
+                    <span className="text-[10px] text-txt-muted">{gp.total} tickets · {gp.totalHours}h · {gp.done}/{gp.total} ({gp.percentage}%)</span>
+                    <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
+                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto">
+                      <X size={12} />
+                    </button>
+                  </div>
+
+                  {!collapsed && (
+                    <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-2">
+                      {project.members.map(member => {
+                        const memberGroupTickets = groupTickets.filter(t => t.memberId === member.id);
+                        return (
+                          <div key={member.id} className="min-w-[280px] flex-1 space-y-2">
+                            {memberGroupTickets.length === 0 ? (
+                              <div className="border border-dashed border-brd-medium rounded-lg p-4 flex flex-col items-center justify-center text-center min-h-[80px]">
+                                <button onClick={() => { setDefaultMemberId(member.id); setDefaultGroupId(group.id); setCreateTicketOpen(true); }}
+                                  className="text-[10px] text-txt-muted hover:text-primary transition-colors">
+                                  <Plus size={14} className="mx-auto mb-1" /> Add Ticket
+                                </button>
+                              </div>
+                            ) : (
+                              memberGroupTickets.map(ticket => (
+                                <TicketCard
+                                  key={ticket.id}
+                                  ticket={ticket}
+                                  projectId={project.id}
+                                  memberColor={member.color}
+                                  memberName={member.name}
+                                  onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                                />
+                              ))
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Ungrouped */}
+            {ungroupedTickets.length > 0 && (
+              <div className="mb-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="font-mono text-sm font-bold text-txt-muted">UNGROUPED</h3>
+                  <span className="text-[10px] text-txt-muted">{ungroupedTickets.length} tickets</span>
+                </div>
+                <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-2">
+                  {project.members.map(member => {
+                    const memberTickets = ungroupedTickets.filter(t => t.memberId === member.id);
+                    return (
+                      <div key={member.id} className="min-w-[280px] flex-1 space-y-2">
+                        {memberTickets.map(ticket => (
+                          <TicketCard
+                            key={ticket.id} ticket={ticket} projectId={project.id}
+                            memberColor={member.color} memberName={member.name}
+                            onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                          />
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {project.tickets.length === 0 && project.members.length > 0 && (
+              <div className="text-center py-12">
+                <TicketIcon size={36} className="text-txt-muted mx-auto mb-3" />
+                <p className="text-sm text-txt-secondary mb-3">No tickets yet. Create your first ticket!</p>
+                <button onClick={() => setCreateTicketOpen(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-semibold">
+                  <Plus size={14} className="inline mr-1" /> Create Ticket
+                </button>
+              </div>
+            )}
+
+            {project.members.length === 0 && (
+              <div className="text-center py-12">
+                <Users size={36} className="text-txt-muted mx-auto mb-3" />
+                <p className="text-sm text-txt-secondary mb-3">Add your first team member to start organizing tickets</p>
+                <button onClick={() => setAddMemberOpen(true)} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-semibold">
+                  <Plus size={14} className="inline mr-1" /> Add Member
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* List View */}
+        {viewMode === 'list' && (
+          <div className="bg-surface-card border border-brd-subtle rounded-xl overflow-hidden">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-brd-subtle">
+                  {['code', 'name', 'member', 'priority', 'status', 'hours', 'group'].map(col => (
+                    <th key={col} className="text-left px-4 py-3 text-txt-muted font-mono uppercase tracking-wider cursor-pointer hover:text-txt-primary" onClick={() => toggleSort(col)}>
+                      <span className="flex items-center gap-1">{col} <ArrowUpDown size={10} /></span>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sortedTickets.map(ticket => {
+                  const member = project.members.find(m => m.id === ticket.memberId);
+                  const group = project.groups.find(g => g.id === ticket.groupId);
+                  return (
+                    <tr key={ticket.id}
+                      onClick={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                      className="border-b border-brd-subtle hover:bg-surface-card-hover cursor-pointer transition-colors">
+                      <td className="px-4 py-3 font-code" style={{ color: member?.color }}>{ticket.code}</td>
+                      <td className={`px-4 py-3 text-txt-primary ${ticket.status === 'done' ? 'line-through text-[hsl(var(--done-text))]' : ''}`}>{ticket.name}</td>
+                      <td className="px-4 py-3 text-txt-secondary">{member?.name || '—'}</td>
+                      <td className="px-4 py-3"><PriorityBadge priority={ticket.priority} /></td>
+                      <td className="px-4 py-3"><StatusBadge status={ticket.status} /></td>
+                      <td className="px-4 py-3 text-txt-muted">{ticket.estimatedHours ? `${ticket.estimatedHours}h` : '—'}</td>
+                      <td className="px-4 py-3 text-txt-muted">{group?.label || '—'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {sortedTickets.length === 0 && (
+              <div className="text-center py-8 text-txt-muted text-sm">No tickets match your filters</div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Create/Edit Ticket Modal */}
+      {createTicketOpen && (
+        <CreateTicketModal
+          open={createTicketOpen}
+          onClose={() => { setCreateTicketOpen(false); setEditingTicket(undefined); setDefaultMemberId(undefined); setDefaultGroupId(undefined); }}
+          projectId={project.id}
+          defaultMemberId={defaultMemberId}
+          defaultGroupId={defaultGroupId}
+          editTicket={editingTicket}
+        />
+      )}
+
+      {/* Add Member Modal */}
+      <NexusModal open={addMemberOpen} onClose={() => setAddMemberOpen(false)} title="👤 Add Member">
+        <div className="space-y-3">
+          <input value={memberFormData.name} onChange={e => setMemberFormData({ ...memberFormData, name: e.target.value })} placeholder="Name *"
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted" />
+          <input value={memberFormData.role} onChange={e => setMemberFormData({ ...memberFormData, role: e.target.value })} placeholder="Role (e.g. DEV-A) *"
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted" />
+          <textarea value={memberFormData.responsibilities} onChange={e => setMemberFormData({ ...memberFormData, responsibilities: e.target.value })} placeholder="Responsibilities" rows={2}
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-none" />
+          <div className="flex gap-2 mt-4">
+            <button onClick={() => setAddMemberOpen(false)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
+            <button onClick={handleAddMember} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold">Add Member</button>
+          </div>
+        </div>
+      </NexusModal>
+
+      {/* Add Group Modal */}
+      <NexusModal open={addGroupOpen} onClose={() => setAddGroupOpen(false)} title="📁 Add Group">
+        <div className="space-y-3">
+          <input value={newGroupLabel} onChange={e => setNewGroupLabel(e.target.value)} placeholder="e.g. DAY 3 — DEPLOYMENT"
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm font-mono text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted" />
+          <div className="flex gap-2 mt-4">
+            <button onClick={() => setAddGroupOpen(false)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
+            <button onClick={handleAddGroup} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold">Add Group</button>
+          </div>
+        </div>
+      </NexusModal>
+
+      {/* Import JSON Modal */}
+      <NexusModal open={importOpen} onClose={() => setImportOpen(false)} title="📥 Import Tickets from JSON" wide>
+        <div className="space-y-4">
+          <p className="text-xs text-txt-secondary">Paste JSON array of tickets. Each ticket needs at least <code className="font-code text-primary">name</code> and <code className="font-code text-primary">code</code>.</p>
+          <details className="text-xs text-txt-muted">
+            <summary className="cursor-pointer hover:text-txt-secondary">JSON Schema Reference</summary>
+            <pre className="mt-2 p-3 bg-surface-secondary rounded-md overflow-x-auto font-code text-[10px]">{`[{
+  "code": "A-01", "name": "Ticket Name",
+  "priority": "critical", "status": "done",
+  "estimatedHours": 3, "folderPath": "auth/"
+}]`}</pre>
+          </details>
+          <textarea value={importJson} onChange={e => setImportJson(e.target.value)} rows={8} placeholder="Paste JSON here..."
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm font-code text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-none" />
+          <div>
+            <label className="block text-xs text-txt-secondary mb-1">Assign to member:</label>
+            <select value={importMemberId} onChange={e => setImportMemberId(e.target.value)}
+              className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none">
+              {project.members.map(m => <option key={m.id} value={m.id}>{m.name} ({m.role})</option>)}
+            </select>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button onClick={() => setImportOpen(false)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
+            <button onClick={handleImportJson} disabled={!importJson.trim()}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold disabled:opacity-50">Import Tickets</button>
+          </div>
+        </div>
+      </NexusModal>
+
+      {/* Edit Project Modal */}
+      <NexusModal open={editProjectOpen} onClose={() => setEditProjectOpen(false)} title="⚙️ Project Settings" wide>
+        <EditProjectForm project={project} onClose={() => setEditProjectOpen(false)} />
+      </NexusModal>
+    </div>
+  );
+};
+
+// Inline Edit Project Form
+const EditProjectForm: React.FC<{ project: any; onClose: () => void }> = ({ project, onClose }) => {
+  const { updateProject, deleteProject } = useProjectStore();
+  const navigate = useNavigate();
+  const [name, setName] = useState(project.name);
+  const [description, setDescription] = useState(project.description);
+  const [status, setStatus] = useState(project.status);
+  const [confirmDelete, setConfirmDelete] = useState('');
+
+  const handleSave = () => {
+    updateProject(project.id, { name, description, status });
+    toast.success('Project updated');
+    onClose();
+  };
+
+  const handleDelete = () => {
+    if (confirmDelete === project.name) {
+      deleteProject(project.id);
+      toast.success('Project deleted');
+      navigate('/');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-xs text-txt-secondary mb-1">Project Name</label>
+        <input value={name} onChange={e => setName(e.target.value)}
+          className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm font-mono text-txt-primary outline-none focus:border-primary" />
+      </div>
+      <div>
+        <label className="block text-xs text-txt-secondary mb-1">Description</label>
+        <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3}
+          className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary resize-none" />
+      </div>
+      <div>
+        <label className="block text-xs text-txt-secondary mb-1">Status</label>
+        <select value={status} onChange={e => setStatus(e.target.value)}
+          className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary">
+          <option value="not_started">Not Started</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="on_hold">On Hold</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div className="flex gap-2">
+        <button onClick={onClose} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
+        <button onClick={handleSave} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold">Save Changes</button>
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-nexus-red/30">
+        <h4 className="text-xs font-semibold text-nexus-red mb-2">⚠️ Danger Zone</h4>
+        <p className="text-xs text-txt-muted mb-2">Type "<strong>{project.name}</strong>" to confirm deletion</p>
+        <input value={confirmDelete} onChange={e => setConfirmDelete(e.target.value)} placeholder="Type project name..."
+          className="w-full px-3 py-2 bg-surface-card border border-nexus-red/30 rounded-md text-sm text-txt-primary outline-none mb-2 placeholder:text-txt-muted" />
+        <button onClick={handleDelete} disabled={confirmDelete !== project.name}
+          className="px-4 py-2 bg-nexus-red/20 text-nexus-red rounded-md text-xs font-semibold disabled:opacity-30">
+          Delete Project
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectView;
