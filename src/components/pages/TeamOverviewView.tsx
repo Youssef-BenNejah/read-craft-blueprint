@@ -23,8 +23,7 @@ const TeamOverviewView: React.FC = () => {
   const { projects, addMember, loading } = useProjectStore();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[0], projectId: '' });
-
+  const [form, setForm] = useState({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[0] });
   // Aggregate members across all projects by name
   const memberMap = new Map<string, AggregatedMember>();
   projects.forEach(project => {
@@ -62,20 +61,11 @@ const TeamOverviewView: React.FC = () => {
 
   const handleAddMember = () => {
     if (!form.name.trim() || !form.role.trim()) return;
-    if (form.projectId === 'all') {
-      // Add to all projects
-      projects.forEach(p => {
-        addMember(p.id, { name: form.name, role: form.role, responsibilities: form.responsibilities, color: form.color });
-      });
-      toast.success(`${form.name} added to all ${projects.length} projects`);
-    } else if (form.projectId) {
-      addMember(form.projectId, { name: form.name, role: form.role, responsibilities: form.responsibilities, color: form.color });
-      const projName = projects.find(p => p.id === form.projectId)?.name;
-      toast.success(`${form.name} added to ${projName}`);
-    } else {
-      return;
-    }
-    setForm({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[Math.floor(Math.random() * MEMBER_COLORS.length)], projectId: '' });
+    projects.forEach(p => {
+      addMember(p.id, { name: form.name, role: form.role, responsibilities: form.responsibilities, color: form.color });
+    });
+    toast.success(`${form.name} added to all ${projects.length} projects`);
+    setForm({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[Math.floor(Math.random() * MEMBER_COLORS.length)] });
     setAddOpen(false);
   };
 
@@ -178,21 +168,10 @@ const TeamOverviewView: React.FC = () => {
               ))}
             </div>
           </div>
-          <div>
-            <label className="block text-xs text-txt-secondary mb-1">Add to project *</label>
-            <select value={form.projectId} onChange={e => setForm({ ...form, projectId: e.target.value })}
-              className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary">
-              <option value="">Select a project...</option>
-              <option value="all">All projects</option>
-              {projects.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
           <div className="flex gap-2 mt-4 justify-end">
             <button onClick={() => setAddOpen(false)} className="px-4 py-2 text-xs text-txt-secondary">Cancel</button>
-            <button onClick={handleAddMember} disabled={!form.name.trim() || !form.role.trim() || !form.projectId}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold disabled:opacity-50">Add Member</button>
+            <button onClick={handleAddMember} disabled={!form.name.trim() || !form.role.trim() || projects.length === 0}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-xs font-semibold disabled:opacity-50">Add to All Projects</button>
           </div>
         </div>
       </NexusModal>
