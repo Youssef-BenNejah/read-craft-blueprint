@@ -289,133 +289,129 @@ const ProjectView: React.FC = () => {
           </div>
         </div>
 
-        {/* Board View */}
+        {/* Board View — Parallel Group Columns */}
         {activeView === 'board' && (
           <div>
-            {/* Member column headers */}
-            <div className="flex gap-4 mb-4 overflow-x-auto scrollbar-thin pb-2">
+            {/* Member Summary Bar */}
+            <div className="flex gap-3 mb-4 overflow-x-auto scrollbar-thin pb-2">
               {project.members.map(member => {
                 const mp = getMemberProgress(project, member.id);
                 return (
-                  <div key={member.id} className="min-w-[280px] flex-1">
-                    <div className="bg-surface-card border border-brd-subtle rounded-lg p-3 mb-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: member.color }} />
-                        <span className="font-semibold text-sm text-txt-primary">{member.name}</span>
-                        <span className="font-code text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-txt-muted">{member.role}</span>
-                      </div>
-                      <NexusProgressBar percentage={mp.percentage} color={member.color} height={3} showLabel />
-                      <p className="text-[10px] text-txt-muted mt-1">{mp.done}/{mp.total} tasks</p>
-                      <div className="flex gap-1 mt-2">
-                        <button onClick={() => { setDefaultMemberId(member.id); setCreateTicketOpen(true); }}
-                          className="flex items-center gap-1 px-2 py-1 text-[10px] text-primary border border-primary/30 rounded hover:bg-primary/10 transition-colors">
-                          <Plus size={10} /> Ticket
-                        </button>
-                        <button onClick={() => { setImportMemberId(member.id); setImportOpen(true); }}
-                          className="flex items-center gap-1 px-2 py-1 text-[10px] text-txt-muted border border-brd-subtle rounded hover:border-brd-medium transition-colors">
-                          <Upload size={10} /> Import
-                        </button>
-                      </div>
-                    </div>
+                  <div key={member.id} className="flex items-center gap-2 px-3 py-2 bg-surface-card border border-brd-subtle rounded-lg min-w-fit">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: member.color }} />
+                    <span className="font-semibold text-xs text-txt-primary">{member.name}</span>
+                    <span className="font-code text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-txt-muted">{member.role}</span>
+                    <span className="text-[10px] text-txt-muted">{mp.done}/{mp.total}</span>
                   </div>
                 );
               })}
             </div>
 
-            {/* Groups */}
-            {sortedGroups.map(group => {
-              const gp = getGroupProgress(project, group.id);
-              const collapsed = collapsedGroups.has(group.id);
-              const groupTickets = filterTickets(project.tickets.filter(t => t.groupId === group.id));
+            {/* Parallel Columns */}
+            <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-4" style={{ minHeight: '60vh' }}>
+              {sortedGroups.map(group => {
+                const gp = getGroupProgress(project, group.id);
+                const collapsed = collapsedGroups.has(group.id);
+                const groupTickets = filterTickets(project.tickets.filter(t => t.groupId === group.id));
 
-              return (
-                <div key={group.id} className="mb-4">
-                  <div className="flex items-center gap-3 mb-3 group cursor-pointer" onClick={() => toggleGroup(group.id)}>
-                    {collapsed ? <ChevronRight size={16} className="text-txt-muted" /> : <ChevronDown size={16} className="text-txt-muted" />}
-                    <Calendar size={14} className="text-txt-muted" />
-                    <h3 className="font-mono text-sm font-bold text-txt-primary">{group.label}</h3>
-                    <span className="text-[10px] text-txt-muted">{gp.total} tickets · {gp.totalHours}h · {gp.done}/{gp.total} ({gp.percentage}%)</span>
-                    <button onClick={(e) => { e.stopPropagation(); setImportGroupId(group.id); setImportMemberId(project.members[0]?.id || ''); setImportOpen(true); }}
-                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-primary ml-1" title="Import tickets into this group">
-                      <Upload size={12} />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
-                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto" title="Remove group (keep tickets)">
-                      <X size={12} />
-                    </button>
-                    {groupTickets.length > 0 && (
-                      <button onClick={(e) => { e.stopPropagation(); handleDeleteGroupWithTickets(group.id, group.label); }}
-                        className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red" title="Delete group + all tickets">
-                        <Trash2 size={12} />
-                      </button>
+                return (
+                  <div key={group.id} className="min-w-[320px] flex-1 flex flex-col">
+                    {/* Group Header */}
+                    <div className="bg-surface-card border border-brd-subtle rounded-lg p-3 mb-3 flex-shrink-0">
+                      <div className="flex items-center gap-2 mb-2 cursor-pointer" onClick={() => toggleGroup(group.id)}>
+                        {collapsed ? <ChevronRight size={14} className="text-txt-muted" /> : <ChevronDown size={14} className="text-txt-muted" />}
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: group.color || project.color }} />
+                        <h3 className="font-mono text-sm font-bold text-txt-primary truncate">{group.label}</h3>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] text-txt-muted mb-2">
+                        <span>{gp.total} tickets</span><span>·</span>
+                        <span>{gp.totalHours}h</span><span>·</span>
+                        <span>{gp.done}/{gp.total} ({gp.percentage}%)</span>
+                      </div>
+                      <NexusProgressBar percentage={gp.percentage} color={group.color || project.color} height={3} />
+                      <div className="flex items-center gap-1 mt-2">
+                        <button onClick={(e) => { e.stopPropagation(); setDefaultGroupId(group.id); setCreateTicketOpen(true); }}
+                          className="flex items-center gap-1 px-2 py-1 text-[10px] text-primary border border-primary/30 rounded hover:bg-primary/10 transition-colors">
+                          <Plus size={10} /> Ticket
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); setImportGroupId(group.id); setImportMemberId(project.members[0]?.id || ''); setImportOpen(true); }}
+                          className="flex items-center gap-1 px-2 py-1 text-[10px] text-txt-muted border border-brd-subtle rounded hover:border-brd-medium transition-colors">
+                          <Upload size={10} /> Import
+                        </button>
+                        <div className="ml-auto flex items-center gap-1">
+                          <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
+                            className="text-txt-muted hover:text-nexus-red p-1" title="Remove group (keep tickets)">
+                            <X size={12} />
+                          </button>
+                          {groupTickets.length > 0 && (
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteGroupWithTickets(group.id, group.label); }}
+                              className="text-txt-muted hover:text-nexus-red p-1" title="Delete group + all tickets">
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Group Tickets */}
+                    {!collapsed && (
+                      <div className="space-y-2 flex-1 overflow-y-auto scrollbar-thin pr-1">
+                        {groupTickets.length === 0 ? (
+                          <div className="border border-dashed border-brd-medium rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                            <button onClick={() => { setDefaultGroupId(group.id); setCreateTicketOpen(true); }}
+                              className="text-[10px] text-txt-muted hover:text-primary transition-colors">
+                              <Plus size={14} className="mx-auto mb-1" /> Add Ticket
+                            </button>
+                          </div>
+                        ) : (
+                          groupTickets.map(ticket => {
+                            const member = project.members.find(m => m.id === ticket.memberId);
+                            return (
+                              <TicketCard
+                                key={ticket.id}
+                                ticket={ticket}
+                                projectId={project.id}
+                                memberColor={member?.color || '#888'}
+                                memberName={member?.name || 'Unknown'}
+                                onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                                selectMode={selectMode}
+                                selected={selectedTickets.has(ticket.id)}
+                                onToggleSelect={toggleTicketSelection}
+                              />
+                            );
+                          })
+                        )}
+                      </div>
                     )}
                   </div>
+                );
+              })}
 
-                  {!collapsed && (
-                    <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-2">
-                      {project.members.map(member => {
-                        const memberGroupTickets = groupTickets.filter(t => t.memberId === member.id);
-                        return (
-                          <div key={member.id} className="min-w-[280px] flex-1 space-y-2">
-                            {memberGroupTickets.length === 0 ? (
-                              <div className="border border-dashed border-brd-medium rounded-lg p-4 flex flex-col items-center justify-center text-center min-h-[80px]">
-                                <button onClick={() => { setDefaultMemberId(member.id); setDefaultGroupId(group.id); setCreateTicketOpen(true); }}
-                                  className="text-[10px] text-txt-muted hover:text-primary transition-colors">
-                                  <Plus size={14} className="mx-auto mb-1" /> Add Ticket
-                                </button>
-                              </div>
-                            ) : (
-                              memberGroupTickets.map(ticket => (
-                                <TicketCard
-                                  key={ticket.id}
-                                  ticket={ticket}
-                                  projectId={project.id}
-                                  memberColor={member.color}
-                                  memberName={member.name}
-                                  onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
-                                  selectMode={selectMode}
-                                  selected={selectedTickets.has(ticket.id)}
-                                  onToggleSelect={toggleTicketSelection}
-                                />
-                              ))
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+              {/* Ungrouped column */}
+              {ungroupedTickets.length > 0 && (
+                <div className="min-w-[320px] flex-1 flex flex-col">
+                  <div className="bg-surface-card border border-brd-subtle rounded-lg p-3 mb-3 flex-shrink-0">
+                    <h3 className="font-mono text-sm font-bold text-txt-muted">UNGROUPED</h3>
+                    <span className="text-[10px] text-txt-muted">{ungroupedTickets.length} tickets</span>
+                  </div>
+                  <div className="space-y-2 flex-1 overflow-y-auto scrollbar-thin pr-1">
+                    {ungroupedTickets.map(ticket => {
+                      const member = project.members.find(m => m.id === ticket.memberId);
+                      return (
+                        <TicketCard
+                          key={ticket.id} ticket={ticket} projectId={project.id}
+                          memberColor={member?.color || '#888'} memberName={member?.name || 'Unknown'}
+                          onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                          selectMode={selectMode}
+                          selected={selectedTickets.has(ticket.id)}
+                          onToggleSelect={toggleTicketSelection}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
-              );
-            })}
-
-            {/* Ungrouped */}
-            {ungroupedTickets.length > 0 && (
-              <div className="mb-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <h3 className="font-mono text-sm font-bold text-txt-muted">UNGROUPED</h3>
-                  <span className="text-[10px] text-txt-muted">{ungroupedTickets.length} tickets</span>
-                </div>
-                <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-2">
-                  {project.members.map(member => {
-                    const memberTickets = ungroupedTickets.filter(t => t.memberId === member.id);
-                    return (
-                      <div key={member.id} className="min-w-[280px] flex-1 space-y-2">
-                        {memberTickets.map(ticket => (
-                          <TicketCard
-                            key={ticket.id} ticket={ticket} projectId={project.id}
-                            memberColor={member.color} memberName={member.name}
-                            onEdit={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
-                            selectMode={selectMode}
-                            selected={selectedTickets.has(ticket.id)}
-                            onToggleSelect={toggleTicketSelection}
-                          />
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Empty state */}
             {project.tickets.length === 0 && project.members.length > 0 && (
