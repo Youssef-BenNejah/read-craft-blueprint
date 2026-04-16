@@ -121,8 +121,8 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
 
         <div>
           <label className="block text-xs text-txt-secondary mb-1">Description</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Detailed description..."
-            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-none" />
+          <textarea value={description} onChange={e => setDescription(e.target.value)} rows={Math.max(4, Math.min(12, description.split('\n').length + 1))} placeholder="Detailed description..."
+            className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
         </div>
 
         <div>
