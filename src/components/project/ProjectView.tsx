@@ -16,7 +16,7 @@ const ProjectView: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
+  const { projects, updateTicket, addGroup, addMember, deleteGroup, deleteGroupWithTickets, deleteTickets, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
   const isDocsView = location.pathname.includes('/docs');
 
