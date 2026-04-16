@@ -45,7 +45,7 @@ const TeamOverviewView: React.FC = () => {
           name: member.name,
           color: member.color,
           roles: [member.role],
-          projects: [{ id: project.id, name: project.name, color: project.color }],
+          projects: [{ id: project.id, name: project.name, color: project.color, memberId: member.id }],
           totalTickets: memberTickets.length,
           doneTickets: done,
           totalHours: hours,
