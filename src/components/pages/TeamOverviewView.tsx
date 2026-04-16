@@ -61,20 +61,11 @@ const TeamOverviewView: React.FC = () => {
 
   const handleAddMember = () => {
     if (!form.name.trim() || !form.role.trim()) return;
-    if (form.projectId === 'all') {
-      // Add to all projects
-      projects.forEach(p => {
-        addMember(p.id, { name: form.name, role: form.role, responsibilities: form.responsibilities, color: form.color });
-      });
-      toast.success(`${form.name} added to all ${projects.length} projects`);
-    } else if (form.projectId) {
-      addMember(form.projectId, { name: form.name, role: form.role, responsibilities: form.responsibilities, color: form.color });
-      const projName = projects.find(p => p.id === form.projectId)?.name;
-      toast.success(`${form.name} added to ${projName}`);
-    } else {
-      return;
-    }
-    setForm({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[Math.floor(Math.random() * MEMBER_COLORS.length)], projectId: '' });
+    projects.forEach(p => {
+      addMember(p.id, { name: form.name, role: form.role, responsibilities: form.responsibilities, color: form.color });
+    });
+    toast.success(`${form.name} added to all ${projects.length} projects`);
+    setForm({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[Math.floor(Math.random() * MEMBER_COLORS.length)] });
     setAddOpen(false);
   };
 
