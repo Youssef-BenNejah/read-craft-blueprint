@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import TopBar from '../layout/TopBar';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import NexusModal from '../nexus-ui/NexusModal';
-import { Users, FolderOpen, CheckCircle2, Clock, Plus } from 'lucide-react';
+import { Users, FolderOpen, CheckCircle2, Clock, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AggregatedMember {
