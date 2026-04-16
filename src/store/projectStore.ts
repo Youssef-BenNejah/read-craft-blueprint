@@ -27,6 +27,8 @@ interface AppState {
   addTicket: (projectId: string, ticket: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateTicket: (projectId: string, ticketId: string, updates: Partial<Ticket>) => Promise<void>;
   deleteTicket: (projectId: string, ticketId: string) => Promise<void>;
+  deleteTickets: (projectId: string, ticketIds: string[]) => Promise<void>;
+  deleteGroupWithTickets: (projectId: string, groupId: string) => Promise<void>;
   importTickets: (projectId: string, tickets: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<void>;
 
   // Group CRUD
