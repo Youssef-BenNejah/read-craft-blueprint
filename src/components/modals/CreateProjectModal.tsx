@@ -121,7 +121,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
               {PRESET_COLORS.map(c => (
                 <button key={c} onClick={() => setColor(c)}
                   className={`w-7 h-7 rounded-full transition-transform ${color === c ? 'ring-2 ring-offset-2 ring-offset-surface-modal scale-110' : 'hover:scale-110'}`}
-                  style={{ backgroundColor: c, ringColor: c }} />
+                  style={{ backgroundColor: c }} />
               ))}
             </div>
           </div>
