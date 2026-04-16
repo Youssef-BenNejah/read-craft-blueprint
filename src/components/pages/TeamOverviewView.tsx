@@ -20,9 +20,10 @@ interface AggregatedMember {
 const MEMBER_COLORS = ['#60a5fa', '#f472b6', '#a78bfa', '#34d399', '#fbbf24', '#f87171', '#38bdf8', '#c084fc'];
 
 const TeamOverviewView: React.FC = () => {
-  const { projects, addMember, loading } = useProjectStore();
+  const { projects, addMember, removeMember, loading } = useProjectStore();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AggregatedMember | null>(null);
   const [form, setForm] = useState({ name: '', role: '', responsibilities: '', color: MEMBER_COLORS[0] });
   // Aggregate members across all projects by name
   const memberMap = new Map<string, AggregatedMember>();
