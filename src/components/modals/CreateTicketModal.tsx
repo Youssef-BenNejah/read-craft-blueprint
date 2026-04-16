@@ -55,7 +55,6 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [depInput, setDepInput] = useState('');
   const [dependencies, setDependencies] = useState<string[]>(editTicket?.dependencies || []);
   const [notes, setNotes] = useState(editTicket?.notes || '');
-  const [notes, setNotes] = useState(editTicket?.notes || '');
 
   if (!project) return null;
 
