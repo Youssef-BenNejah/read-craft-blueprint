@@ -19,13 +19,14 @@ const ProjectView: React.FC = () => {
   const { projects, updateTicket, addGroup, addMember, deleteGroup, deleteGroupWithTickets, deleteTickets, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
   const isDocsView = location.pathname.includes('/docs');
+  const isListView = location.pathname.includes('/list');
+  const activeView: 'board' | 'list' | 'docs' = isDocsView ? 'docs' : isListView ? 'list' : 'board';
 
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | undefined>();
   const [defaultMemberId, setDefaultMemberId] = useState<string>();
   const [defaultGroupId, setDefaultGroupId] = useState<string>();
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [addGroupOpen, setAddGroupOpen] = useState(false);
   const [editProjectOpen, setEditProjectOpen] = useState(false);
