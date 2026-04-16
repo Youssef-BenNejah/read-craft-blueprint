@@ -31,6 +31,7 @@ const ProjectView: React.FC = () => {
   const [editProjectOpen, setEditProjectOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importMemberId, setImportMemberId] = useState('');
+  const [importGroupId, setImportGroupId] = useState<string | undefined>();
   const [importJson, setImportJson] = useState('');
   const [newGroupLabel, setNewGroupLabel] = useState('');
   const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
@@ -111,6 +112,7 @@ const ProjectView: React.FC = () => {
         description: t.description || '',
         memberId: importMemberId || project.members[0]?.id || '',
         projectId: project.id,
+        groupId: importGroupId,
         priority: t.priority || 'medium',
         status: t.status || 'todo',
         estimatedHours: t.estimatedHours,
@@ -125,6 +127,7 @@ const ProjectView: React.FC = () => {
       toast.success(`${mapped.length} tickets imported`);
       setImportOpen(false);
       setImportJson('');
+      setImportGroupId(undefined);
     } catch {
       toast.error('Invalid JSON format');
     }
@@ -297,6 +300,10 @@ const ProjectView: React.FC = () => {
                     <Calendar size={14} className="text-txt-muted" />
                     <h3 className="font-mono text-sm font-bold text-txt-primary">{group.label}</h3>
                     <span className="text-[10px] text-txt-muted">{gp.total} tickets · {gp.totalHours}h · {gp.done}/{gp.total} ({gp.percentage}%)</span>
+                    <button onClick={(e) => { e.stopPropagation(); setImportGroupId(group.id); setImportMemberId(project.members[0]?.id || ''); setImportOpen(true); }}
+                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-primary ml-1" title="Import tickets into this group">
+                      <Upload size={12} />
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
                       className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto">
                       <X size={12} />
@@ -467,9 +474,9 @@ const ProjectView: React.FC = () => {
       </NexusModal>
 
       {/* Import JSON Modal */}
-      <NexusModal open={importOpen} onClose={() => setImportOpen(false)} title="📥 Import Tickets from JSON" wide>
+      <NexusModal open={importOpen} onClose={() => { setImportOpen(false); setImportGroupId(undefined); }} title={`Import Tickets${importGroupId ? ` → ${project.groups.find(g => g.id === importGroupId)?.label || 'Group'}` : ''}`} wide>
         <div className="space-y-4">
-          <p className="text-xs text-txt-secondary">Paste JSON array of tickets. Each ticket needs at least <code className="font-code text-primary">name</code> and <code className="font-code text-primary">code</code>.</p>
+          <p className="text-xs text-txt-secondary">Paste JSON array of tickets. Each ticket needs at least <code className="font-code text-primary">name</code> and <code className="font-code text-primary">code</code>.{importGroupId && <span className="text-primary ml-1">Tickets will be added to the selected group.</span>}</p>
           <details className="text-xs text-txt-muted">
             <summary className="cursor-pointer hover:text-txt-secondary">JSON Schema Reference</summary>
             <pre className="mt-2 p-3 bg-surface-secondary rounded-md overflow-x-auto font-code text-[10px]">{`[{
