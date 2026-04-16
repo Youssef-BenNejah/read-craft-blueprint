@@ -15,8 +15,10 @@ import { toast } from 'sonner';
 const ProjectView: React.FC = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject } = useProjectStore();
+  const location = useLocation();
+  const { projects, updateTicket, addGroup, addMember, deleteGroup, updateProject, removeMember, addDocument, removeDocument, loading } = useProjectStore();
   const project = projects.find(p => p.id === projectId);
+  const isDocsView = location.pathname.includes('/docs');
 
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | undefined>();
