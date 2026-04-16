@@ -17,8 +17,8 @@ const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: FolderOpen, label: 'All Projects', path: '/' },
-    { icon: Users, label: 'Team Overview', path: '/', badge: undefined },
+    { icon: FolderOpen, label: 'All Projects', path: '/projects' },
+    { icon: Users, label: 'Team Overview', path: '/team', badge: undefined },
     { icon: BarChart3, label: 'Analytics', path: '/', badge: 'Soon' },
     { icon: Settings, label: 'Settings', path: '/', badge: 'Soon' },
   ];
@@ -98,10 +98,12 @@ const Sidebar: React.FC = () => {
       {/* Nav items */}
       {!isProjectView && (
         <nav className="flex-1 py-2 space-y-0.5 px-2">
-          {navItems.map((item, i) => {
-            const isActive = i === 0 && location.pathname === '/';
+          {navItems.map((item) => {
+            const isActive = item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path);
+            const isDisabled = !!item.badge;
             return (
-              <Link key={item.label} to={item.path}
+              <Link key={item.label} to={isDisabled ? '#' : item.path}
+                onClick={isDisabled ? (e: React.MouseEvent) => e.preventDefault() : undefined}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                   isActive
                     ? 'text-primary bg-primary/10 border-l-2 border-primary'

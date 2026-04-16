@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AppLayout from "./components/layout/AppLayout";
 import DashboardView from "./components/dashboard/DashboardView";
+import AllProjectsView from "./components/pages/AllProjectsView";
+import TeamOverviewView from "./components/pages/TeamOverviewView";
 import ProjectView from "./components/project/ProjectView";
 import NotFound from "./pages/NotFound";
 import { useProjectStore } from "./store/projectStore";
@@ -30,6 +32,8 @@ const App = () => (
           <Routes>
             <Route element={<AppLayout />}>
               <Route path="/" element={<DashboardView />} />
+              <Route path="/projects" element={<AllProjectsView />} />
+              <Route path="/team" element={<TeamOverviewView />} />
               <Route path="/project/:projectId" element={<ProjectView />} />
               <Route path="/project/:projectId/list" element={<ProjectView />} />
               <Route path="/project/:projectId/docs" element={<ProjectView />} />
