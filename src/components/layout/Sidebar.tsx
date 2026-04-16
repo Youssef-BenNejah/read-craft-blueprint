@@ -3,24 +3,21 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { useProjectStore } from '../../store/projectStore';
 import { getProjectProgress } from '../../utils/progressCalc';
 import {
-  LayoutDashboard, FolderOpen, Users, BarChart3, Settings,
+  LayoutDashboard, FolderOpen, Users,
   ChevronLeft, ChevronRight, Dot, Target, ClipboardList, FileText
 } from 'lucide-react';
+import { useProjectStore } from '../../store/projectStore';
+import { getProjectProgress } from '../../utils/progressCalc';
+import { NexusBadge } from '../nexus-ui/NexusBadge';
 
-const Sidebar: React.FC = () => {
-  const { sidebarCollapsed, toggleSidebar, projects } = useProjectStore();
-  const location = useLocation();
-  const params = useParams();
-  const currentProjectId = params.projectId;
-  const currentProject = projects.find(p => p.id === currentProjectId);
-  const isProjectView = location.pathname.startsWith('/project/');
+const Sidebar = () => {
+  const { projects, currentView, setCurrentView, setSelectedProjectId, selectedProjectId } = useProjectStore();
+  const [collapsed, setCollapsed] = useState(false);
 
   const navItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: FolderOpen, label: 'All Projects', path: '/projects' },
     { icon: Users, label: 'Team Overview', path: '/team', badge: undefined },
-    { icon: BarChart3, label: 'Analytics', path: '/', badge: 'Soon' },
-    { icon: Settings, label: 'Settings', path: '/', badge: 'Soon' },
   ];
 
   return (
