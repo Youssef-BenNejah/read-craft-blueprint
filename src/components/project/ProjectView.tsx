@@ -82,7 +82,7 @@ const ProjectView: React.FC = () => {
   const handleAddGroup = () => {
     if (!newGroupLabel.trim()) return;
     addGroup(project.id, {
-      id: crypto.randomUUID(), projectId: project.id, label: newGroupLabel,
+      projectId: project.id, label: newGroupLabel,
       order: project.groups.length + 1,
     });
     setNewGroupLabel('');
@@ -92,9 +92,7 @@ const ProjectView: React.FC = () => {
 
   const handleAddMember = () => {
     if (!memberFormData.name || !memberFormData.role) return;
-    addMember(project.id, {
-      id: crypto.randomUUID(), ...memberFormData, joinedAt: new Date().toISOString(),
-    });
+    addMember(project.id, memberFormData);
     setMemberFormData({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
     setAddMemberOpen(false);
     toast.success('Member added');
