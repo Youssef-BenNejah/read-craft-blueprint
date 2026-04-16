@@ -339,9 +339,15 @@ const ProjectView: React.FC = () => {
                       <Upload size={12} />
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); deleteGroup(project.id, group.id); }}
-                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto">
+                      className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red ml-auto" title="Remove group (keep tickets)">
                       <X size={12} />
                     </button>
+                    {groupTickets.length > 0 && (
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteGroupWithTickets(group.id, group.label); }}
+                        className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-nexus-red" title="Delete group + all tickets">
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
 
                   {!collapsed && (
