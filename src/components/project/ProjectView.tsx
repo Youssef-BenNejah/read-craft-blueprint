@@ -338,15 +338,39 @@ const ProjectView: React.FC = () => {
                       if (!ticketId || pid !== project.id) return;
                       const t = project.tickets.find(x => x.id === ticketId);
                       if (!t || t.memberId === member.id) return;
-                      // Generate new code with new dev's prefix (first letter of name)
-                      const prefix = member.name[0].toUpperCase();
-                      const memberTickets = project.tickets.filter(x => x.code.startsWith(prefix + '-'));
-                      const maxNum = memberTickets.reduce((max, x) => {
+
+                      // Find the group where this dev has the most tickets — that's "his column"
+                      const groupCounts = new Map<string, number>();
+                      project.tickets.forEach(x => {
+                        if (x.memberId === member.id && x.groupId) {
+                          groupCounts.set(x.groupId, (groupCounts.get(x.groupId) || 0) + 1);
+                        }
+                      });
+                      let targetGroupId: string | undefined = t.groupId;
+                      if (groupCounts.size > 0) {
+                        targetGroupId = [...groupCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+                      }
+
+                      // Generate new code using the target group's prefix (e.g. BE, FE, AI)
+                      const targetGroup = project.groups.find(g => g.id === targetGroupId);
+                      const groupTickets = project.tickets.filter(x => x.groupId === targetGroupId);
+                      // Derive prefix from existing tickets in that group, fallback to label
+                      let prefix = '';
+                      const existingCode = groupTickets.find(x => x.code.includes('-'))?.code;
+                      if (existingCode) {
+                        prefix = existingCode.split('-')[0];
+                      } else if (targetGroup) {
+                        prefix = targetGroup.label.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase() || 'X';
+                      } else {
+                        prefix = 'X';
+                      }
+                      const maxNum = groupTickets.reduce((max, x) => {
                         const num = parseInt(x.code.split('-')[1]);
                         return isNaN(num) ? max : Math.max(max, num);
                       }, 0);
                       const newCode = `${prefix}-${String(maxNum + 1).padStart(2, '0')}`;
-                      updateTicket(project.id, ticketId, { memberId: member.id, code: newCode });
+
+                      updateTicket(project.id, ticketId, { memberId: member.id, code: newCode, groupId: targetGroupId });
                       toast.success(`Reassigned to ${member.name} (${newCode})`);
                     }}
                     className={`flex items-center gap-2.5 px-4 py-3 border-2 rounded-xl min-w-fit transition-all ${
