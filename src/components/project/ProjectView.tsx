@@ -85,6 +85,32 @@ const ProjectView: React.FC = () => {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Auto-scroll while dragging tickets near viewport edges
+  useEffect(() => {
+    const EDGE = 80;
+    const SPEED = 18;
+    const onDragOver = (e: DragEvent) => {
+      const types = e.dataTransfer?.types;
+      if (!types || !Array.from(types).includes('text/ticket-id')) return;
+      const y = e.clientY;
+      const h = window.innerHeight;
+      if (y < EDGE) window.scrollBy(0, -SPEED);
+      else if (y > h - EDGE) window.scrollBy(0, SPEED);
+      // horizontal scroll for board columns container
+      const x = e.clientX;
+      const w = window.innerWidth;
+      const scrollers = document.querySelectorAll<HTMLElement>('[data-board-scroller]');
+      scrollers.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (y < rect.top || y > rect.bottom) return;
+        if (x < rect.left + EDGE) el.scrollBy({ left: -SPEED });
+        else if (x > rect.right - EDGE) el.scrollBy({ left: SPEED });
+      });
+    };
+    window.addEventListener('dragover', onDragOver);
+    return () => window.removeEventListener('dragover', onDragOver);
+  }, []);
+
   if (!project) return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h2 className="font-mono text-lg text-txt-primary mb-4">Project not found</h2>
@@ -312,8 +338,16 @@ const ProjectView: React.FC = () => {
                       if (!ticketId || pid !== project.id) return;
                       const t = project.tickets.find(x => x.id === ticketId);
                       if (!t || t.memberId === member.id) return;
-                      updateTicket(project.id, ticketId, { memberId: member.id });
-                      toast.success(`Reassigned to ${member.name}`);
+                      // Generate new code with new dev's prefix (first letter of name)
+                      const prefix = member.name[0].toUpperCase();
+                      const memberTickets = project.tickets.filter(x => x.code.startsWith(prefix + '-'));
+                      const maxNum = memberTickets.reduce((max, x) => {
+                        const num = parseInt(x.code.split('-')[1]);
+                        return isNaN(num) ? max : Math.max(max, num);
+                      }, 0);
+                      const newCode = `${prefix}-${String(maxNum + 1).padStart(2, '0')}`;
+                      updateTicket(project.id, ticketId, { memberId: member.id, code: newCode });
+                      toast.success(`Reassigned to ${member.name} (${newCode})`);
                     }}
                     className={`flex items-center gap-2.5 px-4 py-3 border-2 rounded-xl min-w-fit transition-all ${
                       isDropTarget
@@ -332,7 +366,7 @@ const ProjectView: React.FC = () => {
             </div>
 
             {/* Parallel Columns */}
-            <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-4" style={{ minHeight: '60vh' }}>
+            <div data-board-scroller className="flex gap-4 overflow-x-auto scrollbar-thin pb-4" style={{ minHeight: '60vh' }}>
               {sortedGroups.map(group => {
                 const gp = getGroupProgress(project, group.id);
                 const collapsed = collapsedGroups.has(group.id);
