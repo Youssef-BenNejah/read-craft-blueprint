@@ -338,8 +338,16 @@ const ProjectView: React.FC = () => {
                       if (!ticketId || pid !== project.id) return;
                       const t = project.tickets.find(x => x.id === ticketId);
                       if (!t || t.memberId === member.id) return;
-                      updateTicket(project.id, ticketId, { memberId: member.id });
-                      toast.success(`Reassigned to ${member.name}`);
+                      // Generate new code with new dev's prefix (first letter of name)
+                      const prefix = member.name[0].toUpperCase();
+                      const memberTickets = project.tickets.filter(x => x.code.startsWith(prefix + '-'));
+                      const maxNum = memberTickets.reduce((max, x) => {
+                        const num = parseInt(x.code.split('-')[1]);
+                        return isNaN(num) ? max : Math.max(max, num);
+                      }, 0);
+                      const newCode = `${prefix}-${String(maxNum + 1).padStart(2, '0')}`;
+                      updateTicket(project.id, ticketId, { memberId: member.id, code: newCode });
+                      toast.success(`Reassigned to ${member.name} (${newCode})`);
                     }}
                     className={`flex items-center gap-2.5 px-4 py-3 border-2 rounded-xl min-w-fit transition-all ${
                       isDropTarget
