@@ -4,7 +4,6 @@ import { useProjectStore } from '../../store/projectStore';
 import { PriorityBadge, StatusBadge } from '../nexus-ui/NexusBadge';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import { Clock, Folder, ArrowUpRight, Check, Square, CheckSquare } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface Props {
   ticket: Ticket;
@@ -18,9 +17,8 @@ interface Props {
 }
 
 const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit, selectMode, selected, onToggleSelect }) => {
-  const { updateTicket, projects } = useProjectStore();
+  const { updateTicket } = useProjectStore();
   const [bursting, setBursting] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   const isDone = ticket.status === 'done';
   const isBlocked = ticket.status === 'blocked';
 
@@ -50,39 +48,12 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    if (selectMode) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (!dragOver) setDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    if (dragOver) setDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragOver(false);
-    const ticketId = e.dataTransfer.getData('text/ticket-id');
-    const pid = e.dataTransfer.getData('text/project-id');
-    if (!ticketId || pid !== projectId || ticketId === ticket.id) return;
-    if (ticket.memberId === e.dataTransfer.getData('text/source-member-id')) return;
-    updateTicket(projectId, ticketId, { memberId: ticket.memberId });
-    toast.success(`Reassigned to ${memberName}`);
-  };
-
   return (
     <div
       draggable={!selectMode}
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
       onClick={handleClick}
       className={`group relative rounded-lg border transition-colors duration-200 ${!selectMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${
-        dragOver ? 'ring-2 ring-primary border-primary' :
         selected ? 'ring-2 ring-nexus-red border-nexus-red bg-nexus-red/5' :
         isDone ? 'bg-[hsl(142,69%,58%,0.04)] border-brd-subtle' :
         isBlocked ? 'bg-[hsl(0,91%,71%,0.04)] border-l-2 border-l-nexus-red border-brd-subtle' :
