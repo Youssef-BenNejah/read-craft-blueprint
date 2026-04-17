@@ -292,12 +292,35 @@ const ProjectView: React.FC = () => {
         {/* Board View — Parallel Group Columns */}
         {activeView === 'board' && (
           <div>
-            {/* Member Summary Bar */}
-            <div className="flex gap-3 mb-4 overflow-x-auto scrollbar-thin pb-2">
+            {/* Member Summary Bar — Drop targets for reassignment */}
+            <div className="flex items-center gap-3 mb-4 overflow-x-auto scrollbar-thin pb-2">
+              <span className="text-[10px] uppercase tracking-wider text-txt-muted flex-shrink-0">Drop on dev to reassign →</span>
               {project.members.map(member => {
                 const mp = getMemberProgress(project, member.id);
+                const isDropTarget = dragOverMemberId === member.id;
                 return (
-                  <div key={member.id} className="flex items-center gap-2 px-3 py-2 bg-surface-card border border-brd-subtle rounded-lg min-w-fit">
+                  <div
+                    key={member.id}
+                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (dragOverMemberId !== member.id) setDragOverMemberId(member.id); }}
+                    onDragLeave={() => setDragOverMemberId(prev => prev === member.id ? null : prev)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const ticketId = e.dataTransfer.getData('text/ticket-id');
+                      const pid = e.dataTransfer.getData('text/project-id');
+                      setDragOverMemberId(null);
+                      if (!ticketId || pid !== project.id) return;
+                      const t = project.tickets.find(x => x.id === ticketId);
+                      if (!t || t.memberId === member.id) return;
+                      updateTicket(project.id, ticketId, { memberId: member.id });
+                      toast.success(`Reassigned to ${member.name}`);
+                    }}
+                    className={`flex items-center gap-2 px-3 py-2 border rounded-lg min-w-fit transition-all ${
+                      isDropTarget
+                        ? 'bg-primary/10 border-primary scale-105 ring-2 ring-primary/30'
+                        : 'bg-surface-card border-brd-subtle'
+                    }`}
+                    style={isDropTarget ? { borderColor: member.color } : undefined}
+                  >
                     <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: member.color }} />
                     <span className="font-semibold text-xs text-txt-primary">{member.name}</span>
                     <span className="font-code text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-txt-muted">{member.role}</span>
