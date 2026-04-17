@@ -418,6 +418,13 @@ const ProjectView: React.FC = () => {
                     <span className="font-semibold text-sm text-txt-primary">{member.name}</span>
                     <span className="font-code text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-txt-muted">{member.role}</span>
                     <span className="text-[11px] text-txt-muted font-mono">{mp.done}/{mp.total}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); exportMember(member); }}
+                      title={`Export ${member.name}'s tickets as JSON`}
+                      className="ml-1 p-1 rounded text-txt-muted hover:text-primary hover:bg-primary/10 transition-colors"
+                    >
+                      <Download size={12} />
+                    </button>
                   </div>
                 );
               })}
