@@ -85,6 +85,32 @@ const ProjectView: React.FC = () => {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Auto-scroll while dragging tickets near viewport edges
+  useEffect(() => {
+    const EDGE = 80;
+    const SPEED = 18;
+    const onDragOver = (e: DragEvent) => {
+      const types = e.dataTransfer?.types;
+      if (!types || !Array.from(types).includes('text/ticket-id')) return;
+      const y = e.clientY;
+      const h = window.innerHeight;
+      if (y < EDGE) window.scrollBy(0, -SPEED);
+      else if (y > h - EDGE) window.scrollBy(0, SPEED);
+      // horizontal scroll for board columns container
+      const x = e.clientX;
+      const w = window.innerWidth;
+      const scrollers = document.querySelectorAll<HTMLElement>('[data-board-scroller]');
+      scrollers.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (y < rect.top || y > rect.bottom) return;
+        if (x < rect.left + EDGE) el.scrollBy({ left: -SPEED });
+        else if (x > rect.right - EDGE) el.scrollBy({ left: SPEED });
+      });
+    };
+    window.addEventListener('dragover', onDragOver);
+    return () => window.removeEventListener('dragover', onDragOver);
+  }, []);
+
   if (!project) return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h2 className="font-mono text-lg text-txt-primary mb-4">Project not found</h2>
