@@ -185,6 +185,40 @@ const ProjectView: React.FC = () => {
     }
   };
 
+  const exportMember = (member: TeamMember) => {
+    const memberTickets = project.tickets.filter(t => t.memberId === member.id);
+    const ticketsWithGroup = memberTickets.map(t => ({
+      ...t,
+      group: project.groups.find(g => g.id === t.groupId)?.label || null,
+    }));
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      project: { id: project.id, name: project.name },
+      member: {
+        id: member.id, name: member.name, role: member.role,
+        responsibilities: member.responsibilities, color: member.color,
+        avatarEmoji: member.avatarEmoji, joinedAt: member.joinedAt,
+      },
+      stats: {
+        total: memberTickets.length,
+        done: memberTickets.filter(t => t.status === 'done').length,
+        inProgress: memberTickets.filter(t => t.status === 'in_progress').length,
+        todo: memberTickets.filter(t => t.status === 'todo').length,
+        blocked: memberTickets.filter(t => t.status === 'blocked').length,
+        totalEstimatedHours: memberTickets.reduce((s, t) => s + (t.estimatedHours || 0), 0),
+      },
+      tickets: ticketsWithGroup,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${project.name.replace(/\s+/g, '_')}_${member.name.replace(/\s+/g, '_')}_tickets_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${memberTickets.length} tickets for ${member.name}`);
+  };
+
   const exportProject = () => {
     const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -384,6 +418,13 @@ const ProjectView: React.FC = () => {
                     <span className="font-semibold text-sm text-txt-primary">{member.name}</span>
                     <span className="font-code text-[10px] px-1.5 py-0.5 rounded bg-surface-secondary text-txt-muted">{member.role}</span>
                     <span className="text-[11px] text-txt-muted font-mono">{mp.done}/{mp.total}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); exportMember(member); }}
+                      title={`Export ${member.name}'s tickets as JSON`}
+                      className="ml-1 p-1 rounded text-txt-muted hover:text-primary hover:bg-primary/10 transition-colors"
+                    >
+                      <Download size={12} />
+                    </button>
                   </div>
                 );
               })}
