@@ -52,7 +52,7 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
       draggable={!selectMode}
       onDragStart={handleDragStart}
       onClick={handleClick}
-      className={`group relative rounded-lg border cursor-pointer transition-all duration-200 hover:scale-[1.01] active:cursor-grabbing ${
+      className={`group relative rounded-lg border transition-colors duration-200 ${!selectMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${
         selected ? 'ring-2 ring-nexus-red border-nexus-red bg-nexus-red/5' :
         isDone ? 'bg-[hsl(142,69%,58%,0.04)] border-brd-subtle' :
         isBlocked ? 'bg-[hsl(0,91%,71%,0.04)] border-l-2 border-l-nexus-red border-brd-subtle' :
