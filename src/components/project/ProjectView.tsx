@@ -38,6 +38,7 @@ const ProjectView: React.FC = () => {
   const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
   const [selectMode, setSelectMode] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState<Set<string>>(new Set());
+  const [dragOverMemberId, setDragOverMemberId] = useState<string | null>(null);
 
   const toggleTicketSelection = (ticketId: string) => {
     setSelectedTickets(prev => {
