@@ -4,7 +4,6 @@ import { useProjectStore } from '../../store/projectStore';
 import { PriorityBadge, StatusBadge } from '../nexus-ui/NexusBadge';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
 import { Clock, Folder, ArrowUpRight, Check, Square, CheckSquare } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface Props {
   ticket: Ticket;
@@ -18,9 +17,8 @@ interface Props {
 }
 
 const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit, selectMode, selected, onToggleSelect }) => {
-  const { updateTicket, projects } = useProjectStore();
+  const { updateTicket } = useProjectStore();
   const [bursting, setBursting] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   const isDone = ticket.status === 'done';
   const isBlocked = ticket.status === 'blocked';
 
