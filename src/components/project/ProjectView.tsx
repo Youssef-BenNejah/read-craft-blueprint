@@ -366,7 +366,7 @@ const ProjectView: React.FC = () => {
             </div>
 
             {/* Parallel Columns */}
-            <div className="flex gap-4 overflow-x-auto scrollbar-thin pb-4" style={{ minHeight: '60vh' }}>
+            <div data-board-scroller className="flex gap-4 overflow-x-auto scrollbar-thin pb-4" style={{ minHeight: '60vh' }}>
               {sortedGroups.map(group => {
                 const gp = getGroupProgress(project, group.id);
                 const collapsed = collapsedGroups.has(group.id);
