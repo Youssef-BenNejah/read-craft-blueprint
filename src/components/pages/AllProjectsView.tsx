@@ -36,29 +36,29 @@ const AllProjectsView: React.FC = () => {
   return (
     <div className="min-h-screen">
       <TopBar title="All Projects" />
-      <div className="p-6 animate-fade-up">
-        <div className="flex items-center justify-between mb-6">
+      <div className="p-4 sm:p-6 animate-fade-up">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <div>
-            <h1 className="font-mono text-xl font-bold text-txt-primary">All Projects</h1>
+            <h1 className="font-mono text-lg sm:text-xl font-bold text-txt-primary">All Projects</h1>
             <p className="text-xs text-txt-muted mt-1">{projects.length} project{projects.length !== 1 ? 's' : ''} total</p>
           </div>
           <button onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold">
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold w-full sm:w-auto">
             <Plus size={16} /> New Project
           </button>
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-6 flex-wrap">
-          <div className="flex items-center gap-1 px-3 py-1.5 bg-surface-card border border-brd-subtle rounded-md">
-            <Search size={14} className="text-txt-muted" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+          <div className="flex items-center gap-1 px-3 py-1.5 bg-surface-card border border-brd-subtle rounded-md w-full sm:w-auto">
+            <Search size={14} className="text-txt-muted flex-shrink-0" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search projects..."
-              className="bg-transparent text-sm text-txt-primary outline-none w-48 placeholder:text-txt-muted" />
+              className="bg-transparent text-sm text-txt-primary outline-none flex-1 sm:w-48 placeholder:text-txt-muted" />
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1 overflow-x-auto scrollbar-thin -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0">
             {statusFilters.map(sf => (
               <button key={sf.value} onClick={() => setFilter(sf.value)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                className={`px-3 py-1.5 text-xs rounded-md transition-colors whitespace-nowrap flex-shrink-0 ${
                   filter === sf.value ? 'bg-primary text-primary-foreground' : 'text-txt-secondary hover:bg-surface-card'
                 }`}>
                 {sf.label}
@@ -74,25 +74,25 @@ const AllProjectsView: React.FC = () => {
             return (
               <div key={project.id}
                 onClick={() => navigate(`/project/${project.id}`)}
-                className="bg-surface-card border border-brd-subtle rounded-xl p-5 cursor-pointer hover:border-brd-medium transition-all group">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
+                className="bg-surface-card border border-brd-subtle rounded-xl p-4 sm:p-5 cursor-pointer hover:border-brd-medium transition-all group">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
                     <FolderOpen size={20} style={{ color: project.color }} className="mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className="font-mono text-sm font-bold text-txt-primary">{project.name}</h3>
                         <ProjectStatusBadge status={project.status} />
                       </div>
                       <p className="text-xs text-txt-muted line-clamp-2 mb-3">{project.description}</p>
-                      <div className="flex items-center gap-4 text-[11px] text-txt-muted">
+                      <div className="flex items-center gap-x-4 gap-y-1 text-[11px] text-txt-muted flex-wrap">
                         <span className="flex items-center gap-1"><Calendar size={10} /> {formatDate(project.startDate)} — {formatDate(project.endDate)}</span>
                         <span>{project.members.length} member{project.members.length !== 1 ? 's' : ''}</span>
                         <span>{project.tickets.length} ticket{project.tickets.length !== 1 ? 's' : ''}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-32">
+                  <div className="flex items-center gap-3 sm:flex-shrink-0">
+                    <div className="w-full sm:w-32">
                       <NexusProgressBar percentage={prog.percentage} color={project.color} height={4} showLabel />
                     </div>
                     <button onClick={(e) => {
@@ -101,10 +101,10 @@ const AllProjectsView: React.FC = () => {
                         deleteProject(project.id);
                         toast.success('Project deleted');
                       }
-                    }} className="opacity-0 group-hover:opacity-100 p-1.5 text-txt-muted hover:text-nexus-red transition-all">
+                    }} className="sm:opacity-0 sm:group-hover:opacity-100 p-1.5 text-txt-muted hover:text-nexus-red transition-all flex-shrink-0">
                       <Trash2 size={14} />
                     </button>
-                    <ArrowRight size={16} className="text-txt-muted group-hover:text-primary transition-colors" />
+                    <ArrowRight size={16} className="text-txt-muted group-hover:text-primary transition-colors flex-shrink-0 hidden sm:block" />
                   </div>
                 </div>
               </div>
