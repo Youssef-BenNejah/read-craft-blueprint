@@ -333,6 +333,13 @@ const ProjectView: React.FC = () => {
               <option value="medium">Medium</option>
               <option value="low">Low</option>
             </select>
+            <select value={filterMember} onChange={e => setFilterMember(e.target.value)}
+              className="bg-surface-card border border-brd-subtle text-txt-secondary text-xs rounded-md px-2 py-1.5 outline-none max-w-[140px]">
+              <option value="all">All Devs</option>
+              {project.members.map(m => (
+                <option key={m.id} value={m.id}>{m.avatarEmoji} {m.name}</option>
+              ))}
+            </select>
             {hasFilters && (
               <button onClick={() => { setFilterStatus('all'); setFilterPriority('all'); setFilterMember('all'); setSearchQuery(''); }}
                 className="flex items-center gap-1 px-2 py-1.5 text-xs text-nexus-red hover:bg-nexus-red/10 rounded-md">
