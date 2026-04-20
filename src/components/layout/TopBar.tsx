@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useProjectStore } from '../../store/projectStore';
-import { Search, Bell, User } from 'lucide-react';
+import { Search, Bell, User, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface TopBarProps {
@@ -10,7 +10,7 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { projects } = useProjectStore();
+  const { projects, setMobileSidebarOpen } = useProjectStore();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,20 +36,29 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
   } : null;
 
   return (
-    <header className="h-14 bg-surface-primary border-b border-brd-subtle flex items-center justify-between px-6">
-      <h1 className="font-mono text-lg font-semibold text-txt-primary">{title}</h1>
+    <header className="h-14 bg-surface-primary border-b border-brd-subtle flex items-center justify-between px-3 sm:px-6 gap-2 sticky top-0 z-30">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <button
+          onClick={() => setMobileSidebarOpen(true)}
+          className="md:hidden p-2 -ml-1 rounded-md text-txt-secondary hover:text-txt-primary hover:bg-surface-card transition-colors flex-shrink-0"
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
+        <h1 className="font-mono text-base sm:text-lg font-semibold text-txt-primary truncate">{title}</h1>
+      </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         {/* Search */}
         <div className="relative">
-          <button onClick={() => setSearchOpen(!searchOpen)} className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface-card border border-brd-subtle text-txt-secondary text-xs hover:border-brd-medium transition-colors">
+          <button onClick={() => setSearchOpen(!searchOpen)} className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-md bg-surface-card border border-brd-subtle text-txt-secondary text-xs hover:border-brd-medium transition-colors" aria-label="Search">
             <Search size={14} />
-            <span>Search...</span>
-            <kbd className="ml-2 px-1 py-0.5 rounded bg-surface-secondary text-[10px] text-txt-muted border border-brd-subtle">/</kbd>
+            <span className="hidden sm:inline">Search...</span>
+            <kbd className="hidden sm:inline ml-2 px-1 py-0.5 rounded bg-surface-secondary text-[10px] text-txt-muted border border-brd-subtle">/</kbd>
           </button>
 
           {searchOpen && (
-            <div className="absolute right-0 top-10 w-80 bg-surface-modal border border-brd-medium rounded-lg shadow-lg z-50 animate-modal-in">
+            <div className="absolute right-0 top-10 w-[calc(100vw-1.5rem)] sm:w-80 max-w-sm bg-surface-modal border border-brd-medium rounded-lg shadow-lg z-50 animate-modal-in">
               <input
                 ref={inputRef}
                 value={searchQuery}
@@ -92,10 +101,10 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
           )}
         </div>
 
-        <button className="p-2 rounded-md text-txt-muted hover:text-txt-secondary hover:bg-surface-card transition-colors">
+        <button className="hidden sm:flex p-2 rounded-md text-txt-muted hover:text-txt-secondary hover:bg-surface-card transition-colors">
           <Bell size={18} />
         </button>
-        <div className="w-8 h-8 rounded-full bg-surface-card border border-brd-subtle flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-surface-card border border-brd-subtle flex items-center justify-center flex-shrink-0">
           <User size={16} className="text-txt-secondary" />
         </div>
       </div>

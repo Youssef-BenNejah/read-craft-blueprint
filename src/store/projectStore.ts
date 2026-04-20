@@ -7,6 +7,7 @@ interface AppState {
   projects: Project[];
   activeProjectId: string | null;
   sidebarCollapsed: boolean;
+  mobileSidebarOpen: boolean;
   loading: boolean;
   initialized: boolean;
 
@@ -42,6 +43,7 @@ interface AppState {
 
   setActiveProject: (id: string | null) => void;
   toggleSidebar: () => void;
+  setMobileSidebarOpen: (open: boolean) => void;
 }
 
 // Helper to map DB row to app types
@@ -87,6 +89,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
   projects: [],
   activeProjectId: null,
   sidebarCollapsed: false,
+  mobileSidebarOpen: false,
   loading: true,
   initialized: false,
 
@@ -443,4 +446,5 @@ export const useProjectStore = create<AppState>((set, get) => ({
 
   setActiveProject: (id) => set({ activeProjectId: id }),
   toggleSidebar: () => set(s => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+  setMobileSidebarOpen: (open) => set({ mobileSidebarOpen: open }),
 }));
