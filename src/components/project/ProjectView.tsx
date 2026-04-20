@@ -255,30 +255,30 @@ const ProjectView: React.FC = () => {
     <div className="min-h-screen">
       <TopBar title={project.name} />
 
-      <div className="p-6 animate-fade-up">
+      <div className="p-4 sm:p-6 animate-fade-up">
         {/* Project Header */}
-        <div className="bg-surface-card border border-brd-subtle rounded-xl p-6 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <FolderOpen size={24} style={{ color: project.color }} />
-                <h1 className="font-mono text-xl font-bold text-txt-primary">{project.name}</h1>
+        <div className="bg-surface-card border border-brd-subtle rounded-xl p-4 sm:p-6 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <FolderOpen size={24} style={{ color: project.color }} className="flex-shrink-0" />
+                <h1 className="font-mono text-lg sm:text-xl font-bold text-txt-primary break-words">{project.name}</h1>
                 <ProjectStatusBadge status={project.status} />
               </div>
               <p className="text-sm text-txt-secondary mb-3">{project.description}</p>
-              <div className="flex items-center gap-4 text-xs text-txt-muted">
+              <div className="flex items-center gap-x-4 gap-y-1 text-xs text-txt-muted flex-wrap">
                 <span className="flex items-center gap-1"><Calendar size={12} />{formatDate(project.startDate)} – {formatDate(project.endDate)}</span>
                 <span className="flex items-center gap-1"><Users size={12} />{project.members.length} Devs × {days} Days</span>
                 <span className="flex items-center gap-1"><TicketIcon size={12} />{total} Tickets</span>
               </div>
             </div>
 
-            <div className="text-right min-w-[200px]">
+            <div className="lg:text-right lg:min-w-[200px]">
               <p className="text-[10px] uppercase tracking-wider text-txt-muted mb-1">Sprint Progress</p>
               <p className="font-mono text-3xl font-bold text-primary mb-2">{percentage}%</p>
               <NexusProgressBar percentage={percentage} color={project.color} height={6} />
               <p className="text-xs text-txt-muted mt-1">{done}/{total} tasks</p>
-              <div className="flex items-center gap-2 mt-3 justify-end">
+              <div className="flex items-center gap-2 mt-3 lg:justify-end">
                 <button onClick={exportProject} className="p-1.5 rounded border border-brd-subtle text-txt-muted hover:text-txt-primary text-xs"><FileText size={14} /></button>
                 <button onClick={() => setEditProjectOpen(true)} className="p-1.5 rounded border border-brd-subtle text-txt-muted hover:text-txt-primary"><Settings size={14} /></button>
               </div>
@@ -287,34 +287,34 @@ const ProjectView: React.FC = () => {
         </div>
 
         {/* Action bar */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2 flex-wrap">
             <button onClick={() => setAddMemberOpen(true)} className="flex items-center gap-1 px-3 py-1.5 text-xs text-txt-secondary border border-brd-subtle rounded-md hover:border-primary hover:text-primary transition-colors">
-              <Plus size={12} /> Add Member
+              <Plus size={12} /> <span className="hidden sm:inline">Add </span>Member
             </button>
             <button onClick={() => setAddGroupOpen(true)} className="flex items-center gap-1 px-3 py-1.5 text-xs text-txt-secondary border border-brd-subtle rounded-md hover:border-primary hover:text-primary transition-colors">
-              <Plus size={12} /> Add Group
+              <Plus size={12} /> <span className="hidden sm:inline">Add </span>Group
             </button>
             <button onClick={() => setCreateTicketOpen(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold">
-              <Plus size={12} /> New Ticket
+              <Plus size={12} /> <span className="hidden sm:inline">New </span>Ticket
             </button>
             <button onClick={() => { setSelectMode(!selectMode); setSelectedTickets(new Set()); }}
               className={`flex items-center gap-1 px-3 py-1.5 text-xs border rounded-md transition-colors ${selectMode ? 'bg-nexus-red/10 border-nexus-red text-nexus-red' : 'text-txt-secondary border-brd-subtle hover:border-primary hover:text-primary'}`}>
-              <CheckSquare size={12} /> {selectMode ? 'Cancel Select' : 'Select'}
+              <CheckSquare size={12} /> {selectMode ? 'Cancel' : 'Select'}
             </button>
             {selectMode && selectedTickets.size > 0 && (
               <button onClick={handleBulkDelete}
                 className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
-                <Trash2 size={12} /> Delete {selectedTickets.size} ticket{selectedTickets.size > 1 ? 's' : ''}
+                <Trash2 size={12} /> Delete {selectedTickets.size}
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Filters */}
-            <div className="flex items-center gap-1 px-2 py-1 bg-surface-card border border-brd-subtle rounded-md">
-              <Search size={12} className="text-txt-muted" />
-              <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Filter tickets..."
-                className="bg-transparent text-xs text-txt-primary outline-none w-28 placeholder:text-txt-muted" />
+            <div className="flex items-center gap-1 px-2 py-1 bg-surface-card border border-brd-subtle rounded-md flex-1 sm:flex-none min-w-0">
+              <Search size={12} className="text-txt-muted flex-shrink-0" />
+              <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Filter..."
+                className="bg-transparent text-xs text-txt-primary outline-none w-full sm:w-28 placeholder:text-txt-muted" />
             </div>
             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)}
               className="bg-surface-card border border-brd-subtle text-txt-secondary text-xs rounded-md px-2 py-1.5 outline-none">
@@ -339,7 +339,7 @@ const ProjectView: React.FC = () => {
                 <X size={12} /> Clear
               </button>
             )}
-            <div className="flex border border-brd-subtle rounded-md overflow-hidden ml-2">
+            <div className="flex border border-brd-subtle rounded-md overflow-hidden ml-auto sm:ml-2">
               <button onClick={() => navigate(`/project/${projectId}`)} className={`p-1.5 ${activeView === 'board' ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-muted'}`}>
                 <LayoutGrid size={14} />
               </button>
@@ -562,36 +562,38 @@ const ProjectView: React.FC = () => {
         {/* List View */}
         {activeView === 'list' && (
           <div className="bg-surface-card border border-brd-subtle rounded-xl overflow-hidden">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-brd-subtle">
-                  {['code', 'name', 'member', 'priority', 'status', 'hours', 'group'].map(col => (
-                    <th key={col} className="text-left px-4 py-3 text-txt-muted font-mono uppercase tracking-wider cursor-pointer hover:text-txt-primary" onClick={() => toggleSort(col)}>
-                      <span className="flex items-center gap-1">{col} <ArrowUpDown size={10} /></span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sortedTickets.map(ticket => {
-                  const member = project.members.find(m => m.id === ticket.memberId);
-                  const group = project.groups.find(g => g.id === ticket.groupId);
-                  return (
-                    <tr key={ticket.id}
-                      onClick={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
-                      className="border-b border-brd-subtle hover:bg-surface-card-hover cursor-pointer transition-colors">
-                      <td className="px-4 py-3 font-code" style={{ color: member?.color }}>{ticket.code}</td>
-                      <td className={`px-4 py-3 text-txt-primary ${ticket.status === 'done' ? 'line-through text-[hsl(var(--done-text))]' : ''}`}>{ticket.name}</td>
-                      <td className="px-4 py-3 text-txt-secondary">{member?.name || '—'}</td>
-                      <td className="px-4 py-3"><PriorityBadge priority={ticket.priority} /></td>
-                      <td className="px-4 py-3"><StatusBadge status={ticket.status} /></td>
-                      <td className="px-4 py-3 text-txt-muted">{ticket.estimatedHours ? `${ticket.estimatedHours}h` : '—'}</td>
-                      <td className="px-4 py-3 text-txt-muted">{group?.label || '—'}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto scrollbar-thin">
+              <table className="w-full text-xs min-w-[720px]">
+                <thead>
+                  <tr className="border-b border-brd-subtle">
+                    {['code', 'name', 'member', 'priority', 'status', 'hours', 'group'].map(col => (
+                      <th key={col} className="text-left px-4 py-3 text-txt-muted font-mono uppercase tracking-wider cursor-pointer hover:text-txt-primary whitespace-nowrap" onClick={() => toggleSort(col)}>
+                        <span className="flex items-center gap-1">{col} <ArrowUpDown size={10} /></span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedTickets.map(ticket => {
+                    const member = project.members.find(m => m.id === ticket.memberId);
+                    const group = project.groups.find(g => g.id === ticket.groupId);
+                    return (
+                      <tr key={ticket.id}
+                        onClick={() => { setEditingTicket(ticket); setCreateTicketOpen(true); }}
+                        className="border-b border-brd-subtle hover:bg-surface-card-hover cursor-pointer transition-colors">
+                        <td className="px-4 py-3 font-code whitespace-nowrap" style={{ color: member?.color }}>{ticket.code}</td>
+                        <td className={`px-4 py-3 text-txt-primary ${ticket.status === 'done' ? 'line-through text-[hsl(var(--done-text))]' : ''}`}>{ticket.name}</td>
+                        <td className="px-4 py-3 text-txt-secondary whitespace-nowrap">{member?.name || '—'}</td>
+                        <td className="px-4 py-3"><PriorityBadge priority={ticket.priority} /></td>
+                        <td className="px-4 py-3"><StatusBadge status={ticket.status} /></td>
+                        <td className="px-4 py-3 text-txt-muted whitespace-nowrap">{ticket.estimatedHours ? `${ticket.estimatedHours}h` : '—'}</td>
+                        <td className="px-4 py-3 text-txt-muted whitespace-nowrap">{group?.label || '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             {sortedTickets.length === 0 && (
               <div className="text-center py-8 text-txt-muted text-sm">No tickets match your filters</div>
             )}
