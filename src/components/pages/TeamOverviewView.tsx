@@ -82,32 +82,32 @@ const TeamOverviewView: React.FC = () => {
   return (
     <div className="min-h-screen">
       <TopBar title="Team Overview" />
-      <div className="p-6 animate-fade-up">
-        <div className="flex items-center justify-between mb-6">
+      <div className="p-4 sm:p-6 animate-fade-up">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <div>
-            <h1 className="font-mono text-xl font-bold text-txt-primary">Team Overview</h1>
+            <h1 className="font-mono text-lg sm:text-xl font-bold text-txt-primary">Team Overview</h1>
             <p className="text-xs text-txt-muted mt-1">All team members across {projects.length} project{projects.length !== 1 ? 's' : ''}</p>
           </div>
           <button onClick={() => setAddOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold">
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold w-full sm:w-auto">
             <Plus size={16} /> Add Member
           </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {[
             { label: 'Team Members', value: totalMembers, icon: Users, color: 'text-nexus-purple' },
             { label: 'Total Tickets', value: totalTickets, icon: FolderOpen, color: 'text-nexus-blue' },
             { label: 'Completed', value: totalDone, icon: CheckCircle2, color: 'text-nexus-green' },
             { label: 'Total Hours', value: `${totalHours}h`, icon: Clock, color: 'text-nexus-orange' },
           ].map(stat => (
-            <div key={stat.label} className="bg-surface-card border border-brd-subtle rounded-xl p-4">
+            <div key={stat.label} className="bg-surface-card border border-brd-subtle rounded-xl p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-2">
-                <stat.icon size={16} className={stat.color} />
-                <span className="text-xs text-txt-muted">{stat.label}</span>
+                <stat.icon size={16} className={`${stat.color} flex-shrink-0`} />
+                <span className="text-[11px] sm:text-xs text-txt-muted truncate">{stat.label}</span>
               </div>
-              <span className="font-mono text-xl font-bold text-txt-primary">{stat.value}</span>
+              <span className="font-mono text-lg sm:text-xl font-bold text-txt-primary">{stat.value}</span>
             </div>
           ))}
         </div>
@@ -117,15 +117,15 @@ const TeamOverviewView: React.FC = () => {
           {members.map(member => {
             const percentage = member.totalTickets > 0 ? Math.round((member.doneTickets / member.totalTickets) * 100) : 0;
             return (
-              <div key={member.name} className="bg-surface-card border border-brd-subtle rounded-xl p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
+              <div key={member.name} className="bg-surface-card border border-brd-subtle rounded-xl p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
                       style={{ backgroundColor: member.color }}>
                       {member.name.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <h3 className="font-mono text-sm font-bold text-txt-primary">{member.name}</h3>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-mono text-sm font-bold text-txt-primary truncate">{member.name}</h3>
                       <p className="text-[11px] text-txt-muted mt-0.5">{member.roles.join(' · ')}</p>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {member.projects.map(p => (
@@ -138,8 +138,8 @@ const TeamOverviewView: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right space-y-1">
-                    <div className="flex items-center gap-3 text-xs text-txt-muted">
+                  <div className="sm:text-right space-y-1 sm:flex-shrink-0">
+                    <div className="flex items-center gap-3 text-xs text-txt-muted sm:justify-end">
                       <span>{member.doneTickets}/{member.totalTickets} tickets</span>
                       <span>{member.totalHours}h</span>
                       <button onClick={() => setDeleteTarget(member)}
@@ -148,7 +148,7 @@ const TeamOverviewView: React.FC = () => {
                         <Trash2 size={14} />
                       </button>
                     </div>
-                    <div className="w-40">
+                    <div className="w-full sm:w-40">
                       <NexusProgressBar percentage={percentage} color={member.color} height={4} showLabel />
                     </div>
                   </div>
