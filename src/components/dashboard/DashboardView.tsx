@@ -59,11 +59,11 @@ const DashboardView: React.FC = () => {
     return (
       <div className="min-h-screen">
         <TopBar title="Dashboard" />
-        <div className="p-6">
-          <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             {[1,2,3,4].map(i => <div key={i} className="h-24 rounded-lg animate-shimmer" />)}
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1,2,3].map(i => <div key={i} className="h-64 rounded-xl animate-shimmer" />)}
           </div>
         </div>
