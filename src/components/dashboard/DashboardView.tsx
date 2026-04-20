@@ -75,33 +75,33 @@ const DashboardView: React.FC = () => {
     <div className="min-h-screen">
       <TopBar title="Dashboard" />
 
-      <div className="p-6 animate-fade-up">
+      <div className="p-4 sm:p-6 animate-fade-up">
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {stats.map(s => (
-            <div key={s.label} className="bg-surface-card border border-brd-subtle rounded-lg p-4 flex items-center gap-4 hover:border-brd-medium transition-colors">
-              <s.icon size={24} className={s.color} />
-              <div>
-                <p className={`font-mono text-2xl font-bold ${s.color}`}>{s.value}</p>
-                <p className="text-xs text-txt-secondary">{s.label}</p>
+            <div key={s.label} className="bg-surface-card border border-brd-subtle rounded-lg p-3 sm:p-4 flex items-center gap-3 sm:gap-4 hover:border-brd-medium transition-colors">
+              <s.icon size={24} className={`${s.color} flex-shrink-0`} />
+              <div className="min-w-0">
+                <p className={`font-mono text-xl sm:text-2xl font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-[11px] sm:text-xs text-txt-secondary truncate">{s.label}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Filter bar */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-thin -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 lg:pb-0">
             {statusFilters.map(f => (
               <button key={f.value} onClick={() => setFilter(f.value)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                   filter === f.value ? 'bg-primary text-primary-foreground' : 'bg-surface-card text-txt-secondary hover:text-txt-primary border border-brd-subtle'
                 }`}>
                 {f.label}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
               className="bg-surface-card border border-brd-subtle text-txt-secondary text-xs rounded-md px-3 py-1.5 outline-none">
               <option value="latest">Sort: Latest</option>
@@ -117,8 +117,8 @@ const DashboardView: React.FC = () => {
               </button>
             </div>
             <button onClick={() => setCreateOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
-              <Plus size={16} /> New Project
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity ml-auto">
+              <Plus size={16} /> <span className="hidden xs:inline">New Project</span><span className="xs:hidden">New</span>
             </button>
           </div>
         </div>
@@ -135,7 +135,7 @@ const DashboardView: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-4' : 'space-y-3'}>
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>
             {filtered.map(project => {
               const { done, total, percentage } = getProjectProgress(project);
               return (
