@@ -53,12 +53,6 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         {/* Search */}
         <div className="relative">
-          <button onClick={() => setSearchOpen(!searchOpen)} className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-md bg-surface-card border border-brd-subtle text-txt-secondary text-xs hover:border-brd-medium transition-colors" aria-label="Search">
-            <Search size={14} />
-            <span className="hidden sm:inline">Search...</span>
-            <kbd className="hidden sm:inline ml-2 px-1 py-0.5 rounded bg-surface-secondary text-[10px] text-txt-muted border border-brd-subtle">/</kbd>
-          </button>
-
           {searchOpen && (
             <div className="absolute right-0 top-10 w-[calc(100vw-1.5rem)] sm:w-80 max-w-sm bg-surface-modal border border-brd-medium rounded-lg shadow-lg z-50 animate-modal-in">
               <input
