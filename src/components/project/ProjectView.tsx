@@ -35,7 +35,7 @@ const ProjectView: React.FC = () => {
   const [importGroupId, setImportGroupId] = useState<string | undefined>();
   const [importJson, setImportJson] = useState('');
   const [newGroupLabel, setNewGroupLabel] = useState('');
-  const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
+  const [memberFormData, setMemberFormData] = useState({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '' });
   const [selectMode, setSelectMode] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState<Set<string>>(new Set());
   const [dragOverMemberId, setDragOverMemberId] = useState<string | null>(null);
@@ -150,7 +150,7 @@ const ProjectView: React.FC = () => {
   const handleAddMember = () => {
     if (!memberFormData.name || !memberFormData.role) return;
     addMember(project.id, memberFormData);
-    setMemberFormData({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '💻' });
+    setMemberFormData({ name: '', role: '', responsibilities: '', color: '#60a5fa', avatarEmoji: '' });
     setAddMemberOpen(false);
     toast.success('Member added');
   };
@@ -337,7 +337,7 @@ const ProjectView: React.FC = () => {
               className="bg-surface-card border border-brd-subtle text-txt-secondary text-xs rounded-md px-2 py-1.5 outline-none max-w-[140px]">
               <option value="all">All Devs</option>
               {project.members.map(m => (
-                <option key={m.id} value={m.id}>{m.avatarEmoji} {m.name}</option>
+                <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
             {hasFilters && (
