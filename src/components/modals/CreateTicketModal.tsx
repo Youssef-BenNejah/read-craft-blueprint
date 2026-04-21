@@ -3,6 +3,7 @@ import NexusModal from '../nexus-ui/NexusModal';
 import { useProjectStore } from '../../store/projectStore';
 import { Ticket, TicketPriority, TicketStatus } from '../../store/types';
 import { toast } from 'sonner';
+import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText } from 'lucide-react';
 
 const PRIORITIES: TicketPriority[] = ['blocker', 'critical', 'high', 'medium', 'low'];
 const STATUSES: TicketStatus[] = ['todo', 'in_progress', 'done', 'blocked'];
@@ -96,7 +97,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   };
 
   return (
-    <NexusModal open={open} onClose={onClose} title={isEdit ? `✏️ Edit Ticket — ${editTicket?.code}` : '🎫 Create Ticket'} wide>
+    <NexusModal open={open} onClose={onClose} title={isEdit ? `Edit Ticket — ${editTicket?.code}` : 'Create Ticket'} wide>
       <div className="space-y-4 max-h-[60vh] overflow-y-auto scrollbar-thin pr-1">
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -160,20 +161,20 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs text-txt-secondary mb-1">⏱ Est. Hours</label>
+            <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><Clock size={11} /> Est. Hours</label>
             <input type="number" min="0" value={estimatedHours} onChange={e => setEstimatedHours(e.target.value)}
               className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary" />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs text-txt-secondary mb-1">📁 Folder Path</label>
+          <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><Folder size={11} /> Folder Path</label>
           <input value={folderPath} onChange={e => setFolderPath(e.target.value)} placeholder="e.g. auth/, domain/"
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted" />
         </div>
 
         <div>
-          <label className="block text-xs text-txt-secondary mb-1">↗ Dependencies</label>
+          <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><ArrowUpRight size={11} /> Dependencies</label>
           <div className="flex gap-2">
             <input value={depInput} onChange={e => setDepInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (depInput.trim()) { setDependencies([...dependencies, depInput.trim()]); setDepInput(''); } } }}
@@ -189,7 +190,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         </div>
 
         <div>
-          <label className="block text-xs text-txt-secondary mb-1">📝 Notes</label>
+          <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><FileText size={11} /> Notes</label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={Math.max(4, Math.min(12, (notes || '').split('\n').length + 1))} placeholder="Private notes..."
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
         </div>

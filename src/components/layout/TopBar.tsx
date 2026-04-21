@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useProjectStore } from '../../store/projectStore';
-import { Search, Bell, User, Menu } from 'lucide-react';
+import { Search, Bell, User, Menu, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../../hooks/use-theme';
 
 interface TopBarProps {
   title: string;
@@ -11,6 +12,7 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { projects, setMobileSidebarOpen } = useProjectStore();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -101,6 +103,14 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
           )}
         </div>
 
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-md text-txt-muted hover:text-txt-primary hover:bg-surface-card transition-colors"
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
         <button className="hidden sm:flex p-2 rounded-md text-txt-muted hover:text-txt-secondary hover:bg-surface-card transition-colors">
           <Bell size={18} />
         </button>

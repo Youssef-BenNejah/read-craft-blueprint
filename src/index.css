@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    /* DARK theme (default) */
     --bg-primary: 0 0% 4%;
     --bg-secondary: 0 0% 6.7%;
     --bg-card: 0 0% 8.6%;
@@ -31,13 +32,6 @@
 
     --progress-bg: 0 0% 10%;
     --progress-fill: 142 69% 58%;
-
-    --badge-blocker-bg: 0 63% 14%;
-    --badge-blocker-text: 0 91% 71%;
-    --badge-critical-bg: 30 100% 8%;
-    --badge-critical-text: 27 96% 61%;
-    --badge-normal-bg: 222 33% 14%;
-    --badge-normal-text: 217 91% 68%;
 
     --done-overlay: 142 69% 58%;
     --done-text: 220 9% 46%;
@@ -74,6 +68,70 @@
 
     --shadow-card: 0 2px 12px rgba(0,0,0,0.5);
     --shadow-modal: 0 20px 60px rgba(0,0,0,0.8);
+  }
+
+  /* LIGHT theme */
+  .light {
+    --bg-primary: 0 0% 98%;
+    --bg-secondary: 0 0% 96%;
+    --bg-card: 0 0% 100%;
+    --bg-card-hover: 0 0% 95%;
+    --bg-modal: 0 0% 100%;
+    --border-subtle: 0 0% 90%;
+    --border-medium: 0 0% 84%;
+    --border-strong: 0 0% 76%;
+
+    --text-primary: 0 0% 10%;
+    --text-secondary: 0 0% 35%;
+    --text-muted: 0 0% 55%;
+    --text-accent: 0 0% 5%;
+
+    --accent-green: 142 71% 38%;
+    --accent-green-dim: 143 50% 75%;
+    --accent-orange: 27 90% 48%;
+    --accent-red: 0 75% 50%;
+    --accent-blue: 217 85% 50%;
+    --accent-purple: 270 60% 55%;
+    --accent-yellow: 38 92% 45%;
+    --accent-cyan: 188 80% 40%;
+
+    --progress-bg: 0 0% 90%;
+    --progress-fill: 142 71% 38%;
+
+    --done-overlay: 142 71% 38%;
+    --done-text: 220 9% 55%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 142 71% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 35%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 88%;
+    --ring: 142 71% 38%;
+
+    --sidebar-background: 0 0% 96%;
+    --sidebar-foreground: 0 0% 35%;
+    --sidebar-primary: 142 71% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 92%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 142 71% 38%;
+
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-modal: 0 20px 60px rgba(0,0,0,0.15);
   }
 }
 

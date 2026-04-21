@@ -5,9 +5,9 @@ const now = new Date().toISOString();
 
 export function generateSeedData(): Project[] {
   const projectId = uid();
-  const memberA: TeamMember = { id: uid(), name: 'Alice', role: 'DEV-A', color: '#60a5fa', avatarEmoji: '💻', responsibilities: 'Frontend + API Integration', joinedAt: now };
-  const memberB: TeamMember = { id: uid(), name: 'Bob', role: 'DEV-B', color: '#f87171', avatarEmoji: '🔧', responsibilities: 'Backend + Database', joinedAt: now };
-  const memberC: TeamMember = { id: uid(), name: 'Carol', role: 'PM', color: '#c084fc', avatarEmoji: '📋', responsibilities: 'Project Management + QA', joinedAt: now };
+  const memberA: TeamMember = { id: uid(), name: 'Alice', role: 'DEV-A', color: '#60a5fa', responsibilities: 'Frontend + API Integration', joinedAt: now };
+  const memberB: TeamMember = { id: uid(), name: 'Bob', role: 'DEV-B', color: '#f87171', responsibilities: 'Backend + Database', joinedAt: now };
+  const memberC: TeamMember = { id: uid(), name: 'Carol', role: 'PM', color: '#c084fc', responsibilities: 'Project Management + QA', joinedAt: now };
 
   const group1: TicketGroup = { id: uid(), projectId, label: 'DAY 1 — SETUP', order: 1 };
   const group2: TicketGroup = { id: uid(), projectId, label: 'DAY 2 — CORE FEATURES', order: 2 };
@@ -31,7 +31,7 @@ export function generateSeedData(): Project[] {
     name: 'Sample Project — App Launch',
     description: 'Demonstration project to showcase NEXUS PM features',
     color: '#4ade80',
-    emoji: '🚀',
+    emoji: 'Rocket',
     status: 'in_progress',
     startDate: '2026-01-01',
     endDate: '2026-01-31',

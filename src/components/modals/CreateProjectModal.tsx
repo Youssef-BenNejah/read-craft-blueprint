@@ -30,7 +30,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [members, setMembers] = useState<Omit<TeamMember, 'id' | 'joinedAt'>[]>([]);
-  const [memberForm, setMemberForm] = useState({ name: '', role: '', responsibilities: '', color: PRESET_COLORS[1], avatarEmoji: '💻' });
+  const [memberForm, setMemberForm] = useState({ name: '', role: '', responsibilities: '', color: PRESET_COLORS[1], avatarEmoji: '' });
   const [showMemberForm, setShowMemberForm] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -48,7 +48,7 @@ const CreateProjectModal: React.FC<Props> = ({ open, onClose }) => {
   const addMember = () => {
     if (!memberForm.name || !memberForm.role) return;
     setMembers([...members, { ...memberForm }]);
-    setMemberForm({ name: '', role: '', responsibilities: '', color: PRESET_COLORS[(members.length + 2) % PRESET_COLORS.length], avatarEmoji: '💻' });
+    setMemberForm({ name: '', role: '', responsibilities: '', color: PRESET_COLORS[(members.length + 2) % PRESET_COLORS.length], avatarEmoji: '' });
     setShowMemberForm(false);
   };
 
