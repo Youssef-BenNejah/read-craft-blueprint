@@ -111,12 +111,6 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <button className="hidden sm:flex p-2 rounded-md text-txt-muted hover:text-txt-secondary hover:bg-surface-card transition-colors">
-          <Bell size={18} />
-        </button>
-        <div className="w-8 h-8 rounded-full bg-surface-card border border-brd-subtle flex items-center justify-center flex-shrink-0">
-          <User size={16} className="text-txt-secondary" />
-        </div>
       </div>
     </header>
   );
