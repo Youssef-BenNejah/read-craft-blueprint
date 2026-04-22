@@ -187,12 +187,8 @@ const DashboardView: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Date + Team */}
-                    <div className="flex items-center justify-between mb-3 text-xs text-txt-secondary">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={12} />
-                        <span>{formatDate(project.startDate)} – {formatDate(project.endDate)}</span>
-                      </div>
+                    {/* Team */}
+                    <div className="flex items-center justify-end mb-3 text-xs text-txt-secondary">
                       <div className="flex items-center gap-1">
                         <div className="flex -space-x-1">
                           {project.members.slice(0, 4).map(m => (

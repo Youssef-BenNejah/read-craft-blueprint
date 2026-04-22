@@ -85,7 +85,6 @@ const AllProjectsView: React.FC = () => {
                       </div>
                       <p className="text-xs text-txt-muted line-clamp-2 mb-3">{project.description}</p>
                       <div className="flex items-center gap-x-4 gap-y-1 text-[11px] text-txt-muted flex-wrap">
-                        <span className="flex items-center gap-1"><Calendar size={10} /> {formatDate(project.startDate)} — {formatDate(project.endDate)}</span>
                         <span>{project.members.length} member{project.members.length !== 1 ? 's' : ''}</span>
                         <span>{project.tickets.length} ticket{project.tickets.length !== 1 ? 's' : ''}</span>
                       </div>

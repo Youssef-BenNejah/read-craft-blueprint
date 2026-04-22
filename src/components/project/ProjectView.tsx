@@ -267,8 +267,7 @@ const ProjectView: React.FC = () => {
               </div>
               <p className="text-sm text-txt-secondary mb-3">{project.description}</p>
               <div className="flex items-center gap-x-4 gap-y-1 text-xs text-txt-muted flex-wrap">
-                <span className="flex items-center gap-1"><Calendar size={12} />{formatDate(project.startDate)} – {formatDate(project.endDate)}</span>
-                <span className="flex items-center gap-1"><Users size={12} />{project.members.length} Devs × {days} Days</span>
+                <span className="flex items-center gap-1"><Users size={12} />{project.members.length} Devs</span>
                 <span className="flex items-center gap-1"><TicketIcon size={12} />{total} Tickets</span>
               </div>
             </div>
