@@ -218,6 +218,36 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={Math.max(4, Math.min(12, (notes || '').split('\n').length + 1))} placeholder="Private notes..."
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
         </div>
+
+        <div>
+          <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><ImagePlus size={11} /> Images</label>
+          <div className="flex flex-wrap gap-2">
+            {images.map((url, i) => (
+              <div key={i} className="relative group/img">
+                <img src={url} alt={`attachment-${i}`} className="w-20 h-20 object-cover rounded-md border border-brd-subtle" />
+                <button
+                  type="button"
+                  onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                  className="absolute -top-1 -right-1 bg-nexus-red text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+            <label className="w-20 h-20 flex flex-col items-center justify-center border border-dashed border-brd-medium rounded-md cursor-pointer hover:border-primary text-txt-muted hover:text-primary transition-colors">
+              {uploading ? (
+                <span className="text-[10px]">Uploading...</span>
+              ) : (
+                <>
+                  <ImagePlus size={18} />
+                  <span className="text-[10px] mt-1">Add</span>
+                </>
+              )}
+              <input type="file" accept="image/*" multiple className="hidden"
+                onChange={e => { handleImageUpload(e.target.files); e.target.value = ''; }} />
+            </label>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
