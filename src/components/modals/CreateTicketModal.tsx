@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import NexusModal from '../nexus-ui/NexusModal';
 import { useProjectStore } from '../../store/projectStore';
 import { Ticket, TicketPriority, TicketStatus } from '../../store/types';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText } from 'lucide-react';
+import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText, ImagePlus, X } from 'lucide-react';
 
 const PRIORITIES: TicketPriority[] = ['blocker', 'critical', 'high', 'medium', 'low'];
 const STATUSES: TicketStatus[] = ['todo', 'in_progress', 'done', 'blocked'];
@@ -56,8 +57,27 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [depInput, setDepInput] = useState('');
   const [dependencies, setDependencies] = useState<string[]>(editTicket?.dependencies || []);
   const [notes, setNotes] = useState(editTicket?.notes || '');
+  const [images, setImages] = useState<string[]>(editTicket?.images || []);
+  const [uploading, setUploading] = useState(false);
 
-  if (!project) return null;
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split('.').pop() || 'png';
+        const path = `${projectId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error } = await supabase.storage.from('ticket-images').upload(path, file, { upsert: false });
+        if (error) { toast.error(`Upload failed: ${error.message}`); continue; }
+        const { data } = supabase.storage.from('ticket-images').getPublicUrl(path);
+        uploaded.push(data.publicUrl);
+      }
+      if (uploaded.length) setImages(prev => [...prev, ...uploaded]);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = () => {
     if (!name.trim() || !code.trim()) return;
