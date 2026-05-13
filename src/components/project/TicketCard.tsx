@@ -103,6 +103,17 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
           )}
         </div>
 
+        {ticket.images && ticket.images.length > 0 && (
+          <div className="flex gap-1 flex-wrap mt-1">
+            {ticket.images.slice(0, 4).map((url, i) => (
+              <img key={i} src={url} alt="" className="w-12 h-12 object-cover rounded border border-brd-subtle" />
+            ))}
+            {ticket.images.length > 4 && (
+              <span className="text-[10px] text-txt-muted self-end">+{ticket.images.length - 4}</span>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );
