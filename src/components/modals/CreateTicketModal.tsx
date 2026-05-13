@@ -79,6 +79,8 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
     }
   };
 
+  if (!project) return null;
+
   const handleSubmit = () => {
     if (!name.trim() || !code.trim()) return;
     const now = new Date().toISOString();
@@ -90,6 +92,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         folderPath: folderPath || undefined,
         dependencies: dependencies.length > 0 ? dependencies : undefined,
         notes: notes || undefined,
+        images,
         completedAt: status === 'done' ? now : undefined,
       });
       toast.success('Ticket updated');
@@ -101,6 +104,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         folderPath: folderPath || undefined,
         dependencies: dependencies.length > 0 ? dependencies : undefined,
         notes: notes || undefined,
+        images,
       };
       addTicket(projectId, ticket);
       toast.success('Ticket created');
