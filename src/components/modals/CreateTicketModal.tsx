@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import NexusModal from '../nexus-ui/NexusModal';
 import { useProjectStore } from '../../store/projectStore';
 import { Ticket, TicketPriority, TicketStatus } from '../../store/types';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText } from 'lucide-react';
+import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText, ImagePlus, X } from 'lucide-react';
 
 const PRIORITIES: TicketPriority[] = ['blocker', 'critical', 'high', 'medium', 'low'];
 const STATUSES: TicketStatus[] = ['todo', 'in_progress', 'done', 'blocked'];
@@ -56,6 +57,27 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [depInput, setDepInput] = useState('');
   const [dependencies, setDependencies] = useState<string[]>(editTicket?.dependencies || []);
   const [notes, setNotes] = useState(editTicket?.notes || '');
+  const [images, setImages] = useState<string[]>(editTicket?.images || []);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split('.').pop() || 'png';
+        const path = `${projectId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error } = await supabase.storage.from('ticket-images').upload(path, file, { upsert: false });
+        if (error) { toast.error(`Upload failed: ${error.message}`); continue; }
+        const { data } = supabase.storage.from('ticket-images').getPublicUrl(path);
+        uploaded.push(data.publicUrl);
+      }
+      if (uploaded.length) setImages(prev => [...prev, ...uploaded]);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   if (!project) return null;
 
@@ -70,6 +92,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         folderPath: folderPath || undefined,
         dependencies: dependencies.length > 0 ? dependencies : undefined,
         notes: notes || undefined,
+        images,
         completedAt: status === 'done' ? now : undefined,
       });
       toast.success('Ticket updated');
@@ -81,6 +104,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         folderPath: folderPath || undefined,
         dependencies: dependencies.length > 0 ? dependencies : undefined,
         notes: notes || undefined,
+        images,
       };
       addTicket(projectId, ticket);
       toast.success('Ticket created');
@@ -193,6 +217,36 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
           <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><FileText size={11} /> Notes</label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={Math.max(4, Math.min(12, (notes || '').split('\n').length + 1))} placeholder="Private notes..."
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><ImagePlus size={11} /> Images</label>
+          <div className="flex flex-wrap gap-2">
+            {images.map((url, i) => (
+              <div key={i} className="relative group/img">
+                <img src={url} alt={`attachment-${i}`} className="w-20 h-20 object-cover rounded-md border border-brd-subtle" />
+                <button
+                  type="button"
+                  onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                  className="absolute -top-1 -right-1 bg-nexus-red text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+            <label className="w-20 h-20 flex flex-col items-center justify-center border border-dashed border-brd-medium rounded-md cursor-pointer hover:border-primary text-txt-muted hover:text-primary transition-colors">
+              {uploading ? (
+                <span className="text-[10px]">Uploading...</span>
+              ) : (
+                <>
+                  <ImagePlus size={18} />
+                  <span className="text-[10px] mt-1">Add</span>
+                </>
+              )}
+              <input type="file" accept="image/*" multiple className="hidden"
+                onChange={e => { handleImageUpload(e.target.files); e.target.value = ''; }} />
+            </label>
+          </div>
         </div>
       </div>
 

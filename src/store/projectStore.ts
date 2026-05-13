@@ -71,7 +71,7 @@ function mapProject(row: any, members: any[], tickets: any[], groups: any[], doc
       priority: t.priority, status: t.status,
       estimatedHours: t.estimated_hours ? Number(t.estimated_hours) : undefined,
       folderPath: t.folder_path, dependencies: t.dependencies || [],
-      tags: t.tags || [], notes: t.notes,
+      tags: t.tags || [], notes: t.notes, images: t.images || [],
       createdAt: t.created_at, updatedAt: t.updated_at, completedAt: t.completed_at,
     })),
     groups: groups.map(g => ({
@@ -266,7 +266,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
       group_id: ticket.groupId || null, priority: ticket.priority, status: ticket.status,
       estimated_hours: ticket.estimatedHours, folder_path: ticket.folderPath,
       dependencies: ticket.dependencies || [], tags: ticket.tags || [],
-      notes: ticket.notes, completed_at: ticket.completedAt,
+      notes: ticket.notes, images: ticket.images || [], completed_at: ticket.completedAt,
     }).select().single();
 
     if (data) {
@@ -276,7 +276,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
         priority: data.priority, status: data.status,
         estimatedHours: data.estimated_hours ? Number(data.estimated_hours) : undefined,
         folderPath: data.folder_path || undefined, dependencies: data.dependencies || [],
-        tags: data.tags || [], notes: data.notes || undefined,
+        tags: data.tags || [], notes: data.notes || undefined, images: data.images || [],
         createdAt: data.created_at, updatedAt: data.updated_at, completedAt: data.completed_at || undefined,
       };
       set(s => ({
@@ -299,6 +299,7 @@ export const useProjectStore = create<AppState>((set, get) => ({
     if (updates.dependencies !== undefined) dbUpdates.dependencies = updates.dependencies;
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
     if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+    if (updates.images !== undefined) dbUpdates.images = updates.images;
     if (updates.completedAt !== undefined) dbUpdates.completed_at = updates.completedAt;
 
     // Optimistic

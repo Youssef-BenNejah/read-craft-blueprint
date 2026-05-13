@@ -187,6 +187,7 @@ export type Database = {
           folder_path: string | null
           group_id: string | null
           id: string
+          images: string[]
           member_id: string
           name: string
           notes: string | null
@@ -206,6 +207,7 @@ export type Database = {
           folder_path?: string | null
           group_id?: string | null
           id?: string
+          images?: string[]
           member_id: string
           name: string
           notes?: string | null
@@ -225,6 +227,7 @@ export type Database = {
           folder_path?: string | null
           group_id?: string | null
           id?: string
+          images?: string[]
           member_id?: string
           name?: string
           notes?: string | null

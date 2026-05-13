@@ -30,6 +30,7 @@ export interface Ticket {
   completedAt?: string;
   tags?: string[];
   notes?: string;
+  images?: string[];
 }
 
 export interface TicketGroup {
