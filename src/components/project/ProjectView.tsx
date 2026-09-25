@@ -558,6 +558,7 @@ const ProjectView: React.FC = () => {
                                 selectMode={selectMode}
                                 selected={selectedTickets.has(ticket.id)}
                                 onToggleSelect={toggleTicketSelection}
+                                onExport={exportTicket}
                               />
                             );
                           })
@@ -586,6 +587,7 @@ const ProjectView: React.FC = () => {
                           selectMode={selectMode}
                           selected={selectedTickets.has(ticket.id)}
                           onToggleSelect={toggleTicketSelection}
+                          onExport={exportTicket}
                         />
                       );
                     })}
