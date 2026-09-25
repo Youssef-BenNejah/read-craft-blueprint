@@ -348,10 +348,16 @@ const ProjectView: React.FC = () => {
               <CheckSquare size={12} /> {selectMode ? 'Cancel' : 'Select'}
             </button>
             {selectMode && selectedTickets.size > 0 && (
-              <button onClick={handleBulkDelete}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
-                <Trash2 size={12} /> Delete {selectedTickets.size}
-              </button>
+              <>
+                <button onClick={exportSelected}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-md font-semibold">
+                  <Download size={12} /> Export {selectedTickets.size}
+                </button>
+                <button onClick={handleBulkDelete}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
+                  <Trash2 size={12} /> Delete {selectedTickets.size}
+                </button>
+              </>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
