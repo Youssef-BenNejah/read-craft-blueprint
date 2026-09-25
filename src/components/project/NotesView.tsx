@@ -20,7 +20,7 @@ const SECTION_STYLE: Record<string, { icon: React.ElementType; tone: string }> =
 const renderInline = (text: string): React.ReactNode[] =>
   text.split(/(`[^`]+`|(?:GET|POST|PUT|PATCH|DELETE)\s+\/\S+|\b[\w.-]*\/[\w./{}:-]+|\b\w+\(\))/g).map((part, i) => {
     if (!part) return null;
-    if (/^`.+`$/.test(part) || /^(GET|POST|PUT|PATCH|DELETE)\s/.test(part) || part.includes('/') || /\w\(\)$/.test(part)) {
+    if (i % 2 === 1) {
       return <code key={i} className="font-code text-[12px] px-1 py-0.5 rounded bg-surface-card-hover text-txt-primary border border-brd-subtle">{part.replace(/`/g, '')}</code>;
     }
     return <React.Fragment key={i}>{part}</React.Fragment>;
