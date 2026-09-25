@@ -10,7 +10,7 @@ const SECTION_STYLE: Record<string, { icon: React.ElementType; tone: string }> =
   subtasks: { icon: ListChecks, tone: 'text-primary' },
   'acceptance criteria': { icon: CheckCircle2, tone: 'text-nexus-green' },
   'rejection criteria': { icon: XCircle, tone: 'text-nexus-red' },
-  'test scenarios': { icon: FlaskConical, tone: 'text-nexus-amber' },
+  'test scenarios': { icon: FlaskConical, tone: 'text-nexus-yellow' },
   'data model': { icon: Database, tone: 'text-nexus-blue' },
   'api endpoints': { icon: Plug, tone: 'text-nexus-purple' },
   'reference notes': { icon: BookOpen, tone: 'text-txt-secondary' },

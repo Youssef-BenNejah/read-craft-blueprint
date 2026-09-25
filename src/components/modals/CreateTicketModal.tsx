@@ -4,7 +4,8 @@ import { useProjectStore } from '../../store/projectStore';
 import { Ticket, TicketPriority, TicketStatus } from '../../store/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText, ImagePlus, X } from 'lucide-react';
+import NotesView from '../project/NotesView';
+import { Pencil, Ticket as TicketIcon, Clock, Folder, ArrowUpRight, FileText, ImagePlus, X, Eye } from 'lucide-react';
 
 const PRIORITIES: TicketPriority[] = ['blocker', 'critical', 'high', 'medium', 'low'];
 const STATUSES: TicketStatus[] = ['todo', 'in_progress', 'done', 'blocked'];
@@ -57,6 +58,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
   const [depInput, setDepInput] = useState('');
   const [dependencies, setDependencies] = useState<string[]>(editTicket?.dependencies || []);
   const [notes, setNotes] = useState(editTicket?.notes || '');
+  const [editNotes, setEditNotes] = useState(!editTicket?.notes);
   const [images, setImages] = useState<string[]>(editTicket?.images || []);
   const [uploading, setUploading] = useState(false);
 
@@ -148,6 +150,7 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
           <label className="block text-xs text-txt-secondary mb-1">Description</label>
           <textarea value={description} onChange={e => setDescription(e.target.value)} rows={Math.max(4, Math.min(12, description.split('\n').length + 1))} placeholder="Detailed description..."
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
+          )}
         </div>
 
         <div>
@@ -214,7 +217,17 @@ const CreateTicketModal: React.FC<Props> = ({ open, onClose, projectId, defaultM
         </div>
 
         <div>
-          <label className="flex items-center gap-1 text-xs text-txt-secondary mb-1"><FileText size={11} /> Notes</label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="flex items-center gap-1 text-xs text-txt-secondary"><FileText size={11} /> Notes</label>
+            {notes.trim() && (
+              <button type="button" onClick={() => setEditNotes(v => !v)} className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border border-brd-subtle text-txt-secondary hover:text-txt-primary hover:border-brd-medium">
+                {editNotes ? <><Eye size={11} /> Preview</> : <><Pencil size={11} /> Edit</>}
+              </button>
+            )}
+          </div>
+          {!editNotes && notes.trim() ? (
+            <div className="max-h-[420px] overflow-y-auto pr-1"><NotesView notes={notes} onChange={setNotes} /></div>
+          ) : (
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={Math.max(4, Math.min(12, (notes || '').split('\n').length + 1))} placeholder="Private notes..."
             className="w-full px-3 py-2 bg-surface-card border border-brd-subtle rounded-md text-sm text-txt-primary outline-none focus:border-primary placeholder:text-txt-muted resize-y min-h-[100px] max-h-[300px] font-mono leading-relaxed" />
         </div>
