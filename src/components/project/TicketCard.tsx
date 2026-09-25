@@ -14,9 +14,10 @@ interface Props {
   selectMode?: boolean;
   selected?: boolean;
   onToggleSelect?: (id: string) => void;
+  onExport?: (ticket: Ticket) => void;
 }
 
-const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit, selectMode, selected, onToggleSelect }) => {
+const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberName, onEdit, selectMode, selected, onToggleSelect, onExport }) => {
   const { updateTicket } = useProjectStore();
   const [bursting, setBursting] = useState(false);
   const isDone = ticket.status === 'done';
@@ -80,6 +81,15 @@ const TicketCard: React.FC<Props> = ({ ticket, projectId, memberColor, memberNam
           <span className="text-[10px] text-txt-muted">{memberName}</span>
 
           <div className="ml-auto flex items-center gap-1">
+            {onExport && !selectMode && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onExport(ticket); }}
+                title="Export ticket as JSON"
+                className="p-1 rounded text-txt-muted opacity-0 group-hover:opacity-100 hover:text-primary hover:bg-primary/10 transition-all"
+              >
+                <Download size={12} />
+              </button>
+            )}
             <PriorityBadge priority={ticket.priority} />
             {ticket.status !== 'todo' && <StatusBadge status={ticket.status} />}
           </div>
