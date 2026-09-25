@@ -230,6 +230,52 @@ const ProjectView: React.FC = () => {
     toast.success('Project exported');
   };
 
+  const downloadJson = (payload: unknown, filename: string) => {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const ticketWithGroup = (t: Ticket) => ({
+    ...t,
+    group: project.groups.find(g => g.id === t.groupId)?.label || null,
+    member: project.members.find(m => m.id === t.memberId)?.name || null,
+  });
+
+  const exportTicket = (ticket: Ticket) => {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      project: { id: project.id, name: project.name },
+      ticket: ticketWithGroup(ticket),
+    };
+    downloadJson(payload, `${project.name.replace(/\s+/g, '_')}_${ticket.code}.json`);
+    toast.success(`Exported ${ticket.code}`);
+  };
+
+  const exportSelected = () => {
+    const tickets = project.tickets.filter(t => selectedTickets.has(t.id));
+    if (tickets.length === 0) return;
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      project: { id: project.id, name: project.name },
+      stats: {
+        total: tickets.length,
+        done: tickets.filter(t => t.status === 'done').length,
+        inProgress: tickets.filter(t => t.status === 'in_progress').length,
+        todo: tickets.filter(t => t.status === 'todo').length,
+        blocked: tickets.filter(t => t.status === 'blocked').length,
+        totalEstimatedHours: tickets.reduce((s, t) => s + (t.estimatedHours || 0), 0),
+      },
+      tickets: tickets.map(ticketWithGroup),
+    };
+    downloadJson(payload, `${project.name.replace(/\s+/g, '_')}_${tickets.length}_tickets_${new Date().toISOString().split('T')[0]}.json`);
+    toast.success(`Exported ${tickets.length} tickets`);
+  };
+
   // Groups + ungrouped
   const sortedGroups = [...project.groups].sort((a, b) => a.order - b.order);
   const ungroupedTickets = filterTickets(project.tickets.filter(t => !t.groupId));
@@ -302,10 +348,16 @@ const ProjectView: React.FC = () => {
               <CheckSquare size={12} /> {selectMode ? 'Cancel' : 'Select'}
             </button>
             {selectMode && selectedTickets.size > 0 && (
-              <button onClick={handleBulkDelete}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
-                <Trash2 size={12} /> Delete {selectedTickets.size}
-              </button>
+              <>
+                <button onClick={exportSelected}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-md font-semibold">
+                  <Download size={12} /> Export {selectedTickets.size}
+                </button>
+                <button onClick={handleBulkDelete}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs bg-nexus-red text-white rounded-md font-semibold">
+                  <Trash2 size={12} /> Delete {selectedTickets.size}
+                </button>
+              </>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -506,6 +558,7 @@ const ProjectView: React.FC = () => {
                                 selectMode={selectMode}
                                 selected={selectedTickets.has(ticket.id)}
                                 onToggleSelect={toggleTicketSelection}
+                                onExport={exportTicket}
                               />
                             );
                           })
@@ -534,6 +587,7 @@ const ProjectView: React.FC = () => {
                           selectMode={selectMode}
                           selected={selectedTickets.has(ticket.id)}
                           onToggleSelect={toggleTicketSelection}
+                          onExport={exportTicket}
                         />
                       );
                     })}
