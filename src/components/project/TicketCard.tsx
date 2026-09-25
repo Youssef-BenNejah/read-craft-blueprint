@@ -3,7 +3,7 @@ import { Ticket } from '../../store/types';
 import { useProjectStore } from '../../store/projectStore';
 import { PriorityBadge, StatusBadge } from '../nexus-ui/NexusBadge';
 import NexusProgressBar from '../nexus-ui/NexusProgressBar';
-import { Clock, Folder, ArrowUpRight, Check, Square, CheckSquare } from 'lucide-react';
+import { Clock, Folder, ArrowUpRight, Check, Square, CheckSquare, Download } from 'lucide-react';
 
 interface Props {
   ticket: Ticket;
